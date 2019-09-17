@@ -7,11 +7,11 @@ cmake-build-debug
 cmake-build-release
 
 # images for recognition
-imgs
+imgs/*
 !imgs/README.md
 
 # machine learning models
-mtCNNModels
+mtCNNModels/*
 !mtCNNModels/README.md
-facenetModels
+facenetModels/*
 !facenetModels/README.md
