@@ -64,9 +64,7 @@ void getFilePaths(std::string imagesPath, std::vector<struct Paths>& paths) {
 }
 
 
-void loadInputImage(std::string inputFilePath, cv::Mat& image) {
+void loadInputImage(std::string inputFilePath, cv::Mat& image, int videoFrameWidth, int videoFrameHeight) {
     image = cv::imread(inputFilePath.c_str());
-    std::cout << "is image empty here? = " << image.empty() << std::endl;
-    cv::resize(image, image, cv::Size(640, 480));
-    std::cout << "no No no" << std::endl;
+    cv::resize(image, image, cv::Size(videoFrameWidth, videoFrameHeight));
 }

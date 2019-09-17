@@ -23,8 +23,8 @@ int main()
     // USER DEFINED VALUES
     const string uffFile="../facenetModels/facenet.uff";
     const string engineFile="../facenetModels/facenet.engine";
-//    DataType dtype = DataType::kHALF;       // ToDo calibrator for INT8
-    DataType dtype = DataType::kFLOAT;
+    DataType dtype = DataType::kHALF;       // ToDo calibrator for INT8
+    //DataType dtype = DataType::kFLOAT;
     bool serializeEngine = true;
     int batchSize = 1;
     int nbFrames = 0;
@@ -33,7 +33,7 @@ int main()
     int videoFrameHeight = 480;
     int maxFacesPerScene = 5;
     float knownPersonThreshold = 1.;
-    bool isCSICam = false;
+    bool isCSICam = true;
 
     // init facenet
     FaceNetClassifier faceNet = FaceNetClassifier(gLogger, dtype, uffFile, engineFile, batchSize, serializeEngine,
@@ -55,7 +55,7 @@ int main()
     cv::Mat image;
     getFilePaths("../imgs", paths);
     for(int i=0; i < paths.size(); i++) {
-        loadInputImage(paths[i].absPath, image);
+        loadInputImage(paths[i].absPath, image, videoFrameWidth, videoFrameHeight);
         outputBbox = mtCNN.findFace(image);
         faceNet.forwardPreprocessing(image, outputBbox, paths, i);
         faceNet.resetVariables();

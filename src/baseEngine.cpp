@@ -40,9 +40,7 @@ void baseEngine::caffeToGIEModel(const std::string &deployFile,                /
         enginePath.append(".engine");
     }
     std::cout << "rawName = " << enginePath << std::endl;
-    std::cout << "fileExists = " << fileExists(enginePath) << std::endl;
     if(fileExists(enginePath)) {
-        std::cout << "NOOOOOOOOOOOOOOOOOOO" << std::endl;
         std::vector<char> trtModelStream_;
         size_t size{ 0 };
 
