@@ -108,10 +108,6 @@ void FaceNetClassifier::getCroppedFacesAndAlign(cv::Mat frame, std::vector<struc
         if((*it).exist){
             cv::Rect facePos(cv::Point((*it).y1, (*it).x1), cv::Point((*it).y2, (*it).x2));
             cv::Mat tempCrop = frame(facePos);
-            // cv::Mat finalCrop;
-            // cv::resize(tempCrop, finalCrop, cv::Size(160, 160), 0, 0, cv::INTER_CUBIC);
-            // m_croppedFaces.push_back(finalCrop);
-        
             struct CroppedFace currFace;
             cv::resize(tempCrop, currFace.faceMat, cv::Size(160, 160), 0, 0, cv::INTER_CUBIC);
             currFace.x1 = it->x1;
@@ -195,7 +191,9 @@ void FaceNetClassifier::forwardPreprocessing(cv::Mat image, std::vector<struct B
     getCroppedFacesAndAlign(image, outputBbox);
     if(!m_croppedFaces.empty()) {
         preprocessFaces();
+        std::cout << "preprocessFaces worked" << std::endl;
         doInference((float*)m_croppedFaces[0].faceMat.ptr<float>(0), m_output);
+        std::cout << "doInference worked" << std::endl;
         struct KnownID person;
         std::size_t index = paths[nbFace].fileName.find_last_of(".");
         std::string rawName = paths[nbFace].fileName.substr(0,index);
@@ -213,16 +211,15 @@ void FaceNetClassifier::forward(cv::Mat frame, std::vector<struct Bbox> outputBb
     for(int i = 0; i < m_croppedFaces.size(); i++) {
         doInference((float*)m_croppedFaces[i].faceMat.ptr<float>(0), m_output);
         m_embeddings.insert(m_embeddings.end(), m_output, m_output+128);
-        //std::cout << "embeddings.size() = " << embeddings.size() << std::endl;
     }
 }
 
 void FaceNetClassifier::featureMatching(cv::Mat &image) {
 
     for(int i = 0; i < (m_embeddings.size()/128); i++) {
-        double minDistance = 100.;
+        double minDistance = 5000.;
         float currDistance = 0.;
-        int winner;
+        int winner = -1;
         for (int j = 0; j < m_knownFaces.size(); j++) {
             std:vector<float> currEmbedding(128);
             std::copy_n(m_embeddings.begin()+(i*128), 128, currEmbedding.begin());
@@ -234,7 +231,6 @@ void FaceNetClassifier::featureMatching(cv::Mat &image) {
             }
             currEmbedding.clear();
         }
-        
         float fontScaler = static_cast<float>(m_croppedFaces[i].x2 - m_croppedFaces[i].x1)/static_cast<float>(m_frameWidth);
         cv::rectangle(image, cv::Point(m_croppedFaces[i].y1, m_croppedFaces[i].x1), cv::Point(m_croppedFaces[i].y2, m_croppedFaces[i].x2), 
                         cv::Scalar(0,0,255), 2,8,0);
@@ -242,8 +238,8 @@ void FaceNetClassifier::featureMatching(cv::Mat &image) {
             cv::putText(image, m_knownFaces[winner].className, cv::Point(m_croppedFaces[i].y1+2, m_croppedFaces[i].x2-2), 
                     cv::FONT_HERSHEY_PLAIN, 0.7 + 2*fontScaler,  cv::Scalar(0,0,255,255), 1);
         }
-        else {
-            cv::putText(image, m_knownFaces[winner].className, cv::Point(m_croppedFaces[i].y1+2, m_croppedFaces[i].x2-2), 
+        else if ((minDistance >= m_knownPersonThresh) || (winner == -1)){
+            cv::putText(image, "New Person?", cv::Point(m_croppedFaces[i].y1+2, m_croppedFaces[i].x2-2),
                     cv::FONT_HERSHEY_PLAIN, 0.7 + 2*fontScaler ,  cv::Scalar(0,0,255,255), 1);
         }
     }
