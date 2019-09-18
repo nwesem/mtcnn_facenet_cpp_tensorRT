@@ -235,12 +235,12 @@ void FaceNetClassifier::featureMatching(cv::Mat &image) {
         cv::rectangle(image, cv::Point(m_croppedFaces[i].y1, m_croppedFaces[i].x1), cv::Point(m_croppedFaces[i].y2, m_croppedFaces[i].x2), 
                         cv::Scalar(0,0,255), 2,8,0);
         if (minDistance < m_knownPersonThresh) {
-            cv::putText(image, m_knownFaces[winner].className, cv::Point(m_croppedFaces[i].y1+2, m_croppedFaces[i].x2-2), 
-                    cv::FONT_HERSHEY_PLAIN, 0.7 + 2*fontScaler,  cv::Scalar(0,0,255,255), 1);
+            cv::putText(image, m_knownFaces[winner].className, cv::Point(m_croppedFaces[i].y1+2, m_croppedFaces[i].x2-3),
+                    cv::FONT_HERSHEY_DUPLEX, 0.1 + 2*fontScaler,  cv::Scalar(0,0,255,255), 1);
         }
         else if ((minDistance >= m_knownPersonThresh) || (winner == -1)){
-            cv::putText(image, "New Person?", cv::Point(m_croppedFaces[i].y1+2, m_croppedFaces[i].x2-2),
-                    cv::FONT_HERSHEY_PLAIN, 0.7 + 2*fontScaler ,  cv::Scalar(0,0,255,255), 1);
+            cv::putText(image, "New Person", cv::Point(m_croppedFaces[i].y1+2, m_croppedFaces[i].x2-3),
+                    cv::FONT_HERSHEY_DUPLEX, 0.1 + 2*fontScaler ,  cv::Scalar(0,0,255,255), 1);
         }
     }
     std::cout << "\n";
