@@ -61,6 +61,7 @@ void baseEngine::caffeToGIEModel(const std::string &deployFile,                /
         ICudaEngine *engine = runtime->deserializeCudaEngine(trtModelStream_.data(), size, nullptr);
         assert(engine);
         context = engine->createExecutionContext();
+        std::cout << std::endl;
     }
     else {
         // create the builder

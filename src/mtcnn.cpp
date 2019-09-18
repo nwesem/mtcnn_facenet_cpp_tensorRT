@@ -38,7 +38,7 @@ mtcnn::mtcnn(int row, int col){
     //generate pnet models
     pnet_engine = new Pnet_engine[scales_.size()];
     simpleFace_ = (Pnet**)malloc(sizeof(Pnet*)*scales_.size());
-    std::cout << "scales.size() = " << scales_.size() << std::endl;
+    // std::cout << "scales.size() = " << scales_.size() << std::endl;
     for (size_t i = 0; i < scales_.size(); i++) {
         int changedH = (int)ceil(row*scales_.at(i));
         int changedW = (int)ceil(col*scales_.at(i));

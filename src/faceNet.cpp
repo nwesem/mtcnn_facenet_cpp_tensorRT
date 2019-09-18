@@ -3,11 +3,13 @@
 
 FaceNetClassifier::FaceNetClassifier
 (Logger gLogger, DataType dtype, const string uffFile, const string engineFile, int batchSize, bool serializeEngine,
-        float knownPersonThreshold, int maxFacesPerScene) {
+        float knownPersonThreshold, int maxFacesPerScene, int frameWidth, int frameHeight) {
 
     m_INPUT_C = static_cast<const int>(3);
     m_INPUT_H = static_cast<const int>(160);
     m_INPUT_W = static_cast<const int>(160);
+    m_frameWidth = static_cast<const int>(frameWidth);
+    m_frameHeight = static_cast<const int>(frameHeight);
     m_gLogger = gLogger;
     m_dtype = dtype;
     m_uffFile = static_cast<const string>(uffFile);
@@ -44,6 +46,7 @@ void FaceNetClassifier::createOrLoadEngine() {
         IRuntime* runtime = createInferRuntime(m_gLogger);
         assert(runtime != nullptr);
         m_engine = runtime->deserializeCudaEngine(trtModelStream_.data(), size, nullptr);
+        std::cout << std::endl;
     }
     else {
         IBuilder *builder = createInferBuilder(m_gLogger);
@@ -51,10 +54,6 @@ void FaceNetClassifier::createOrLoadEngine() {
         IUffParser *parser = createUffParser();
         parser->registerInput("input", DimsCHW(160, 160, 3), UffInputOrder::kNHWC);
         parser->registerOutput("embeddings");
-        //  parser->registerOutput("orientation/l2_normalize");
-        //  parser->registerOutput("dimension/LeakyRelu");
-        //  parser->registerOutput("confidence/Softmax");
-        // END USER DEFINED VALUES
 
         if (!parser->parse(m_uffFile.c_str(), *network, m_dtype))
         {
@@ -109,10 +108,19 @@ void FaceNetClassifier::getCroppedFacesAndAlign(cv::Mat frame, std::vector<struc
         if((*it).exist){
             cv::Rect facePos(cv::Point((*it).y1, (*it).x1), cv::Point((*it).y2, (*it).x2));
             cv::Mat tempCrop = frame(facePos);
-            cv::Mat finalCrop;
-            cv::resize(tempCrop, finalCrop, cv::Size(160, 160), 0, 0, cv::INTER_CUBIC);
-            m_croppedFaces.push_back(finalCrop);
-            
+            // cv::Mat finalCrop;
+            // cv::resize(tempCrop, finalCrop, cv::Size(160, 160), 0, 0, cv::INTER_CUBIC);
+            // m_croppedFaces.push_back(finalCrop);
+        
+            struct CroppedFace currFace;
+            cv::resize(tempCrop, currFace.faceMat, cv::Size(160, 160), 0, 0, cv::INTER_CUBIC);
+            currFace.x1 = it->x1;
+            currFace.y1 = it->y1;
+            currFace.x2 = it->x2;
+            currFace.y2 = it->y2;
+            currFace.area = it->area;
+            m_croppedFaces.push_back(currFace);
+
             // DEBUG
             // cv::imshow("croppedFace1", finalCrop);
         }
@@ -124,8 +132,8 @@ void FaceNetClassifier::preprocessFaces() {
     // preprocess according to facenet training and flatten for input to runtime engine
     for (int i = 0; i < m_croppedFaces.size(); i++) {
         //mean and std
-        cvtColor(m_croppedFaces[i], m_croppedFaces[i], CV_RGB2BGR);
-        cv::Mat temp = m_croppedFaces[i].reshape(1, m_croppedFaces[i].rows * 3);
+        cvtColor(m_croppedFaces[i].faceMat, m_croppedFaces[i].faceMat, CV_RGB2BGR);
+        cv::Mat temp = m_croppedFaces[i].faceMat.reshape(1, m_croppedFaces[i].faceMat.rows * 3);
         cv::Mat mean3;
         cv::Mat stddev3;
         cv::meanStdDev(temp, mean3, stddev3);
@@ -133,14 +141,22 @@ void FaceNetClassifier::preprocessFaces() {
         double mean_pxl = mean3.at<double>(0);
         double stddev_pxl = stddev3.at<double>(0);
         cv::Mat image2;
-        m_croppedFaces[i].convertTo(image2, CV_64FC1);
-        m_croppedFaces[i] = image2;
-        m_croppedFaces[i] = m_croppedFaces[i] - cv::Vec3d(mean_pxl, mean_pxl, mean_pxl);
-        m_croppedFaces[i] = m_croppedFaces[i] / stddev_pxl;
+        m_croppedFaces[i].faceMat.convertTo(image2, CV_64FC1);
+        m_croppedFaces[i].faceMat = image2;
+        // m_croppedFaces[i] = m_croppedFaces[i] - cv::Vec3d(mean_pxl, mean_pxl, mean_pxl);
+        // fix by peererror
+        cv::Mat mat(4, 1, CV_64FC1);
+		mat.at <double>(0, 0) = mean_pxl;
+		mat.at <double>(1, 0) = mean_pxl;
+		mat.at <double>(2, 0) = mean_pxl;
+		mat.at <double>(3, 0) = 0;
+        m_croppedFaces[i].faceMat = m_croppedFaces[i].faceMat - mat;
+        // end fix
+        m_croppedFaces[i].faceMat = m_croppedFaces[i].faceMat / stddev_pxl;
 
         //new
-        m_croppedFaces[i].convertTo(image2, CV_32FC3);
-        m_croppedFaces[i] = image2;
+        m_croppedFaces[i].faceMat.convertTo(image2, CV_32FC3);
+        m_croppedFaces[i].faceMat = image2;
     }
 }
 
@@ -179,7 +195,7 @@ void FaceNetClassifier::forwardPreprocessing(cv::Mat image, std::vector<struct B
     getCroppedFacesAndAlign(image, outputBbox);
     if(!m_croppedFaces.empty()) {
         preprocessFaces();
-        doInference((float*)m_croppedFaces[0].ptr<float>(0), m_output);
+        doInference((float*)m_croppedFaces[0].faceMat.ptr<float>(0), m_output);
         struct KnownID person;
         std::size_t index = paths[nbFace].fileName.find_last_of(".");
         std::string rawName = paths[nbFace].fileName.substr(0,index);
@@ -195,13 +211,13 @@ void FaceNetClassifier::forward(cv::Mat frame, std::vector<struct Bbox> outputBb
     this->getCroppedFacesAndAlign(frame, outputBbox); // ToDo align faces according to points
     preprocessFaces();
     for(int i = 0; i < m_croppedFaces.size(); i++) {
-        doInference((float*)m_croppedFaces[i].ptr<float>(0), m_output);
+        doInference((float*)m_croppedFaces[i].faceMat.ptr<float>(0), m_output);
         m_embeddings.insert(m_embeddings.end(), m_output, m_output+128);
         //std::cout << "embeddings.size() = " << embeddings.size() << std::endl;
     }
 }
 
-void FaceNetClassifier::featureMatching() {
+void FaceNetClassifier::featureMatching(cv::Mat &image) {
 
     for(int i = 0; i < (m_embeddings.size()/128); i++) {
         double minDistance = 100.;
@@ -210,27 +226,25 @@ void FaceNetClassifier::featureMatching() {
         for (int j = 0; j < m_knownFaces.size(); j++) {
             std:vector<float> currEmbedding(128);
             std::copy_n(m_embeddings.begin()+(i*128), 128, currEmbedding.begin());
-            // currDistance = std::sqrt(std::inner_product(currEmbedding.begin(), currEmbedding.end(), m_knownFaces[j].embeddedFace.begin(), 0));
             currDistance = vectors_distance(currEmbedding, m_knownFaces[j].embeddedFace);
-            // std::cout << "Distance to " << m_knownFaces[j].className << " is " << currDistance << std::endl;
-            // std::cout << "currEmbedding = " << std::endl;
-            // for (auto it = currEmbedding.begin(); it!=currEmbedding.end(); ++it) std::cout << *it << " ";
-            // std::cout << std::endl;
-            // std::cout << "knownFace of " << m_knownFaces[j].className << " = " << std::endl;
-            // for (auto it = m_knownFaces[j].embeddedFace.begin(); it!=m_knownFaces[j].embeddedFace.end(); ++it) std::cout << *it << " ";
-            // std::cout << std::endl;
-            printf("The distance to %s is %.10f \n", m_knownFaces[j].className.c_str(), currDistance);
+            // printf("The distance to %s is %.10f \n", m_knownFaces[j].className.c_str(), currDistance);
             if (currDistance < minDistance) {
                     minDistance = currDistance;
                     winner = j;
             }
             currEmbedding.clear();
         }
+        
+        float fontScaler = static_cast<float>(m_croppedFaces[i].x2 - m_croppedFaces[i].x1)/static_cast<float>(m_frameWidth);
+        cv::rectangle(image, cv::Point(m_croppedFaces[i].y1, m_croppedFaces[i].x1), cv::Point(m_croppedFaces[i].y2, m_croppedFaces[i].x2), 
+                        cv::Scalar(0,0,255), 2,8,0);
         if (minDistance < m_knownPersonThresh) {
-            std::cout << m_knownFaces[winner].className << std::endl;
+            cv::putText(image, m_knownFaces[winner].className, cv::Point(m_croppedFaces[i].y1+2, m_croppedFaces[i].x2-2), 
+                    cv::FONT_HERSHEY_PLAIN, 0.7 + 2*fontScaler,  cv::Scalar(0,0,255,255), 1);
         }
         else {
-            std::cout << "New Person?" << std::endl;
+            cv::putText(image, m_knownFaces[winner].className, cv::Point(m_croppedFaces[i].y1+2, m_croppedFaces[i].x2-2), 
+                    cv::FONT_HERSHEY_PLAIN, 0.7 + 2*fontScaler ,  cv::Scalar(0,0,255,255), 1);
         }
     }
     std::cout << "\n";

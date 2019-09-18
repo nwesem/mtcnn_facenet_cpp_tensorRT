@@ -37,7 +37,7 @@ int main()
 
     // init facenet
     FaceNetClassifier faceNet = FaceNetClassifier(gLogger, dtype, uffFile, engineFile, batchSize, serializeEngine,
-            knownPersonThreshold, maxFacesPerScene);
+            knownPersonThreshold, maxFacesPerScene, videoFrameWidth, videoFrameHeight);
 
     // init opencv stuff
     VideoStreamer videoStreamer = VideoStreamer(0, videoFrameWidth, videoFrameHeight, 60, isCSICam);
@@ -76,7 +76,7 @@ int main()
 
         auto startFW = chrono::steady_clock::now();
         faceNet.forward(frame, outputBbox);
-        faceNet.featureMatching();
+        faceNet.featureMatching(frame);
         faceNet.resetVariables();
         auto endFW = chrono::steady_clock::now();
 
@@ -89,6 +89,7 @@ int main()
                   "ms" << std::endl;
         std::cout << "Inference took " << std::chrono::duration_cast<chrono::milliseconds>(endFW - startFW).count() <<
                   "ms" << std::endl;
+
         outputBbox.clear();
     }
     auto end = chrono::steady_clock::now();

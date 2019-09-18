@@ -22,12 +22,19 @@
 using namespace nvinfer1;
 using namespace nvuffparser;
 
+struct CroppedFace {
+    cv::Mat faceMat;
+    int x1, y1, x2, y2;
+    float area;
+};
+
 
 class FaceNetClassifier {
 private:
     int m_INPUT_C;
     int m_INPUT_H;
     int m_INPUT_W;
+    int m_frameWidth, m_frameHeight;
     Logger m_gLogger;
     DataType m_dtype;
     string m_uffFile;
@@ -38,15 +45,15 @@ private:
     ICudaEngine *m_engine;
     IExecutionContext *m_context;
     float m_output[128];
-    
-    std::vector<cv::Mat> m_croppedFaces;
-    
-    float m_knownPersonThresh;
-public:
     std::vector<float> m_embeddings;
     std::vector<struct KnownID> m_knownFaces;
+    // std::vector<cv::Mat> m_croppedFaces;
+    std::vector<struct CroppedFace> m_croppedFaces;
+    float m_knownPersonThresh;
+
+public:
     FaceNetClassifier(Logger gLogger, DataType dtype, const string uffFile, const string engineFile, int batchSize,
-            bool serializeEngine, float knownPersonThreshold, int maxFacesPerScene=5);
+            bool serializeEngine, float knownPersonThreshold, int maxFacesPerScene, int frameWidth, int frameHeight);
     ~FaceNetClassifier();
 
     void createOrLoadEngine();
@@ -55,7 +62,7 @@ public:
     void doInference(float* inputData, float* output);
     void forwardPreprocessing(cv::Mat image, std::vector<struct Bbox> outputBbox, std::vector<struct Paths> paths, int nbFace);
     void forward(cv::Mat image, std::vector<struct Bbox> outputBbox);
-    void featureMatching();
+    void featureMatching(cv::Mat &image);
     void resetVariables();
 
 };
