@@ -1,5 +1,6 @@
 #include "faceNet.h"
 
+int FaceNetClassifier::m_classCount = 0;
 
 FaceNetClassifier::FaceNetClassifier
 (Logger gLogger, DataType dtype, const string uffFile, const string engineFile, int batchSize, bool serializeEngine,
@@ -115,9 +116,6 @@ void FaceNetClassifier::getCroppedFacesAndAlign(cv::Mat frame, std::vector<struc
             currFace.x2 = it->x2;
             currFace.y2 = it->y2;            
             m_croppedFaces.push_back(currFace);
-
-            // DEBUG
-            // cv::imshow("croppedFace1", finalCrop);
         }
     }
     //ToDo align
@@ -138,7 +136,6 @@ void FaceNetClassifier::preprocessFaces() {
         cv::Mat image2;
         m_croppedFaces[i].faceMat.convertTo(image2, CV_64FC1);
         m_croppedFaces[i].faceMat = image2;
-
         // fix by peererror
         cv::Mat mat(4, 1, CV_64FC1);
 		mat.at <double>(0, 0) = mean_pxl;
@@ -147,9 +144,7 @@ void FaceNetClassifier::preprocessFaces() {
 		mat.at <double>(3, 0) = 0;
         m_croppedFaces[i].faceMat = m_croppedFaces[i].faceMat - mat;
         // end fix
-
         m_croppedFaces[i].faceMat = m_croppedFaces[i].faceMat / stddev_pxl;
-        //new
         m_croppedFaces[i].faceMat.convertTo(image2, CV_32FC3);
         m_croppedFaces[i].faceMat = image2;
     }
@@ -183,8 +178,8 @@ void FaceNetClassifier::doInference(float* inputData, float* output) {
 }
 
 
-void FaceNetClassifier::forwardPreprocessing(cv::Mat image, std::vector<struct Bbox> outputBbox,
-        std::vector<struct Paths> paths, int nbFace) {
+void FaceNetClassifier::forwardAddFace(cv::Mat image, std::vector<struct Bbox> outputBbox,
+        const string className) {
     
     //cv::resize(image, image, cv::Size(1280, 720), 0, 0, cv::INTER_CUBIC);
     getCroppedFacesAndAlign(image, outputBbox);
@@ -192,12 +187,11 @@ void FaceNetClassifier::forwardPreprocessing(cv::Mat image, std::vector<struct B
         preprocessFaces();
         doInference((float*)m_croppedFaces[0].faceMat.ptr<float>(0), m_output);
         struct KnownID person;
-        std::size_t index = paths[nbFace].fileName.find_last_of(".");
-        std::string rawName = paths[nbFace].fileName.substr(0,index);
-        person.className = rawName;
-        person.classNumber = nbFace;
+        person.className = className;
+        person.classNumber = m_classCount;
         person.embeddedFace.insert(person.embeddedFace.begin(), m_output, m_output+128);
         m_knownFaces.push_back(person);
+        m_classCount++;
     }
     m_croppedFaces.clear();
 }
@@ -221,7 +215,7 @@ void FaceNetClassifier::featureMatching(cv::Mat &image) {
             std:vector<float> currEmbedding(128);
             std::copy_n(m_embeddings.begin()+(i*128), 128, currEmbedding.begin());
             currDistance = vectors_distance(currEmbedding, m_knownFaces[j].embeddedFace);
-            //printf("The distance to %s is %.10f \n", m_knownFaces[j].className.c_str(), currDistance);
+             printf("The distance to %s is %.10f \n", m_knownFaces[j].className.c_str(), currDistance);
             // if ((currDistance < m_knownPersonThresh) && (currDistance < minDistance)) {
             if (currDistance < minDistance) {
                     minDistance = currDistance;
@@ -236,12 +230,24 @@ void FaceNetClassifier::featureMatching(cv::Mat &image) {
             cv::putText(image, m_knownFaces[winner].className, cv::Point(m_croppedFaces[i].y1+2, m_croppedFaces[i].x2-3),
                     cv::FONT_HERSHEY_DUPLEX, 0.1 + 2*fontScaler,  cv::Scalar(0,0,255,255), 1);
         }
-        else if ((minDistance > m_knownPersonThresh) || (winner == -1)){
+        else if (minDistance > m_knownPersonThresh || winner == -1){
             cv::putText(image, "New Person", cv::Point(m_croppedFaces[i].y1+2, m_croppedFaces[i].x2-3),
                     cv::FONT_HERSHEY_DUPLEX, 0.1 + 2*fontScaler ,  cv::Scalar(0,0,255,255), 1);
         }
     }
-    std::cout << "\n";
+}
+
+void FaceNetClassifier::addNewFace(cv::Mat &image, std::vector<struct Bbox> outputBbox) {
+    std::cout << "Adding new person...\nPlease make sure there is only one face in the current frame.\n"
+              << "What's your name? ";
+    string newName;
+    std::cin >> newName;
+    std::cout << "Hi " << newName << ", you will be added to the database.\n";
+    forwardAddFace(image, outputBbox, newName);
+    string filePath = "../imgs/";
+    filePath.append(newName);
+    filePath.append(".jpg");
+    cv::imwrite(filePath, image);
 }
 
 void FaceNetClassifier::resetVariables() {
@@ -264,7 +270,6 @@ float vectors_distance(const std::vector<float>& a, const std::vector<float>& b)
     std::transform (a.begin(), a.end(), b.begin(), std::back_inserter(auxiliary),//
                     [](float element1, float element2) {return pow((element1-element2),2);});
     auxiliary.shrink_to_fit();
-
     float loopSum = 0.;
     for(auto it=auxiliary.begin(); it!=auxiliary.end(); ++it) loopSum += *it;
 

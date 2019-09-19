@@ -30,6 +30,7 @@ struct CroppedFace {
 
 class FaceNetClassifier {
 private:
+    static int m_classCount;
     int m_INPUT_C;
     int m_INPUT_H;
     int m_INPUT_W;
@@ -59,9 +60,10 @@ public:
     void getCroppedFacesAndAlign(cv::Mat frame, std::vector<struct Bbox> outputBbox);
     void preprocessFaces();
     void doInference(float* inputData, float* output);
-    void forwardPreprocessing(cv::Mat image, std::vector<struct Bbox> outputBbox, std::vector<struct Paths> paths, int nbFace);
+    void forwardAddFace(cv::Mat image, std::vector<struct Bbox> outputBbox, const string className);
     void forward(cv::Mat image, std::vector<struct Bbox> outputBbox);
     void featureMatching(cv::Mat &image);
+    void addNewFace(cv::Mat &image, std::vector<struct Bbox> outputBbox);
     void resetVariables();
 
 };

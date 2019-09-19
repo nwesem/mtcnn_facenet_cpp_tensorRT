@@ -34,7 +34,7 @@ int main()
     int videoFrameHeight = 480;
     int maxFacesPerScene = 5;
     float knownPersonThreshold = 1.;
-    bool isCSICam = true;
+    bool isCSICam = false;
 
     // init facenet
     FaceNetClassifier faceNet = FaceNetClassifier(gLogger, dtype, uffFile, engineFile, batchSize, serializeEngine,
@@ -58,13 +58,15 @@ int main()
     for(int i=0; i < paths.size(); i++) {
         loadInputImage(paths[i].absPath, image, videoFrameWidth, videoFrameHeight);
         outputBbox = mtCNN.findFace(image);
-        faceNet.forwardPreprocessing(image, outputBbox, paths, i);
+        std::size_t index = paths[i].fileName.find_last_of(".");
+        std::string rawName = paths[i].fileName.substr(0,index);
+        faceNet.forwardAddFace(image, outputBbox, rawName);
         faceNet.resetVariables();
     }
     outputBbox.clear();
 
     // loop over frames with inference
-    auto start = chrono::steady_clock::now();
+    auto globalTimeStart = chrono::steady_clock::now();
     while (true) {
         videoStreamer.getFrame(frame);
         if (frame.empty()) {
@@ -83,30 +85,38 @@ int main()
         faceNet.resetVariables();
         
 
-        cv::imshow("InputFrame", frame);
+        cv::imshow("VideoSource", frame);
         nbFrames++;
+        outputBbox.clear();
+        frame.release();
+
         char keyboard = cv::waitKey(1);
         if (keyboard == 'q' || keyboard == 27)
             break;
-                
+        else if(keyboard == 'n') {
+            auto dTimeStart = chrono::steady_clock::now();
+            videoStreamer.getFrame(frame);
+            outputBbox = mtCNN.findFace(frame);
+            cv::imshow("VideoSource", frame);
+            faceNet.addNewFace(frame, outputBbox);
+            auto dTimeEnd = chrono::steady_clock::now();
+            globalTimeStart += (dTimeEnd - dTimeStart);
+        }
+
         #ifdef LOG_TIMES
-        std::cout << "mtCNN took " << std::chrono::duration_cast<chrono::milliseconds>(endMTCNN - startMTCNN).count() <<
-                  "ms" << std::endl;
-        std::cout << "Forward took " << std::chrono::duration_cast<chrono::milliseconds>(endForward - startForward).count() <<
-                  "ms" << std::endl;
-        std::cout << "Feature matching took " << std::chrono::duration_cast<chrono::milliseconds>(endFeatM - startFeatM).count() <<
-                  "ms" << std::endl;
+        std::cout << "mtCNN took " << std::chrono::duration_cast<chrono::milliseconds>(endMTCNN - startMTCNN).count() << "ms\n";
+        std::cout << "Forward took " << std::chrono::duration_cast<chrono::milliseconds>(endForward - startForward).count() << "ms\n";
+        std::cout << "Feature matching took " << std::chrono::duration_cast<chrono::milliseconds>(endFeatM - startFeatM).count() << "ms\n\n";
         #endif
-        outputBbox.clear();
     }
-    auto end = chrono::steady_clock::now();
+    auto globalTimeEnd = chrono::steady_clock::now();
     cv::destroyAllWindows();
-    auto milliseconds = chrono::duration_cast<chrono::milliseconds>(end-start).count();
+    auto milliseconds = chrono::duration_cast<chrono::milliseconds>(globalTimeEnd-globalTimeStart).count();
     double seconds = double(milliseconds)/1000.;
     double fps = nbFrames/seconds;
 
     std::cout << "Counted " << nbFrames << " frames in " << double(milliseconds)/1000. << " seconds!" <<
-              " This equals " << fps << "fps." << std::endl;
+              " This equals " << fps << "fps.\n";
 
     return 0;
 }
