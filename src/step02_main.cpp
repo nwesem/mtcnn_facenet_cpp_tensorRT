@@ -13,6 +13,8 @@
 using namespace nvinfer1;
 using namespace nvuffparser;
 
+// Uncomment to print time in milliseconds
+//#define LOG_TIMES
 
 int main()
 {
@@ -28,7 +30,6 @@ int main()
     bool serializeEngine = true;
     int batchSize = 1;
     int nbFrames = 0;
-    time_t timeStart, timeEnd;
     int videoFrameWidth = 640;
     int videoFrameHeight = 480;
     int maxFacesPerScene = 5;
@@ -73,23 +74,29 @@ int main()
         auto startMTCNN = chrono::steady_clock::now();
         outputBbox = mtCNN.findFace(frame);
         auto endMTCNN = chrono::steady_clock::now();
-
-        auto startFW = chrono::steady_clock::now();
+        auto startForward = chrono::steady_clock::now();
         faceNet.forward(frame, outputBbox);
+        auto endForward = chrono::steady_clock::now();
+        auto startFeatM = chrono::steady_clock::now();
         faceNet.featureMatching(frame);
+        auto endFeatM = chrono::steady_clock::now();
         faceNet.resetVariables();
-        auto endFW = chrono::steady_clock::now();
+        
 
         cv::imshow("InputFrame", frame);
         nbFrames++;
         char keyboard = cv::waitKey(1);
         if (keyboard == 'q' || keyboard == 27)
             break;
+                
+        #ifdef LOG_TIMES
         std::cout << "mtCNN took " << std::chrono::duration_cast<chrono::milliseconds>(endMTCNN - startMTCNN).count() <<
                   "ms" << std::endl;
-        std::cout << "Inference took " << std::chrono::duration_cast<chrono::milliseconds>(endFW - startFW).count() <<
+        std::cout << "Forward took " << std::chrono::duration_cast<chrono::milliseconds>(endForward - startForward).count() <<
                   "ms" << std::endl;
-
+        std::cout << "Feature matching took " << std::chrono::duration_cast<chrono::milliseconds>(endFeatM - startFeatM).count() <<
+                  "ms" << std::endl;
+        #endif
         outputBbox.clear();
     }
     auto end = chrono::steady_clock::now();

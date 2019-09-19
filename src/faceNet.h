@@ -25,7 +25,6 @@ using namespace nvuffparser;
 struct CroppedFace {
     cv::Mat faceMat;
     int x1, y1, x2, y2;
-    float area;
 };
 
 
@@ -68,7 +67,6 @@ public:
 };
 
 float vectors_distance(const std::vector<float>& a, const std::vector<float>& b);
-//inline bool fileExists(const std::string &name);
 inline unsigned int elementSize(nvinfer1::DataType t);
 
 #endif //FACE_RECOGNITION_FACENET_H
