@@ -52,7 +52,6 @@ void getFilePaths(std::string imagesPath, std::vector<struct Paths>& paths) {
         while ((entry = readdir (dir)) != NULL) {
             std::string readmeCheck(entry->d_name);
             if (entry->d_type != DT_DIR && readmeCheck != "README.md") {
-                std::cout << "entry->d_off = " << entry->d_name << std::endl;
                 struct Paths tempPaths;
                 tempPaths.fileName = std::string(entry->d_name);
                 tempPaths.absPath = imagesPath + "/" + tempPaths.fileName;

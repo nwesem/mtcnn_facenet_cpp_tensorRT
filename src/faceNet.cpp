@@ -215,7 +215,7 @@ void FaceNetClassifier::featureMatching(cv::Mat &image) {
             std:vector<float> currEmbedding(128);
             std::copy_n(m_embeddings.begin()+(i*128), 128, currEmbedding.begin());
             currDistance = vectors_distance(currEmbedding, m_knownFaces[j].embeddedFace);
-             printf("The distance to %s is %.10f \n", m_knownFaces[j].className.c_str(), currDistance);
+            // printf("The distance to %s is %.10f \n", m_knownFaces[j].className.c_str(), currDistance);
             // if ((currDistance < m_knownPersonThresh) && (currDistance < minDistance)) {
             if (currDistance < minDistance) {
                     minDistance = currDistance;

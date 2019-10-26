@@ -10,11 +10,12 @@
 #include "network.h"
 #include "mtcnn.h"
 
+// Uncomment to print timings in milliseconds
+// #define LOG_TIMES
+
 using namespace nvinfer1;
 using namespace nvuffparser;
 
-// Uncomment to print time in milliseconds
-//#define LOG_TIMES
 
 int main()
 {
@@ -34,7 +35,7 @@ int main()
     int videoFrameHeight = 480;
     int maxFacesPerScene = 5;
     float knownPersonThreshold = 1.;
-    bool isCSICam = false;
+    bool isCSICam = true;
 
     // init facenet
     FaceNetClassifier faceNet = FaceNetClassifier(gLogger, dtype, uffFile, engineFile, batchSize, serializeEngine,
@@ -84,7 +85,6 @@ int main()
         auto endFeatM = chrono::steady_clock::now();
         faceNet.resetVariables();
         
-
         cv::imshow("VideoSource", frame);
         nbFrames++;
         outputBbox.clear();
@@ -107,7 +107,7 @@ int main()
         std::cout << "mtCNN took " << std::chrono::duration_cast<chrono::milliseconds>(endMTCNN - startMTCNN).count() << "ms\n";
         std::cout << "Forward took " << std::chrono::duration_cast<chrono::milliseconds>(endForward - startForward).count() << "ms\n";
         std::cout << "Feature matching took " << std::chrono::duration_cast<chrono::milliseconds>(endFeatM - startFeatM).count() << "ms\n\n";
-        #endif
+        #endif  // LOG_TIMES
     }
     auto globalTimeEnd = chrono::steady_clock::now();
     cv::destroyAllWindows();
