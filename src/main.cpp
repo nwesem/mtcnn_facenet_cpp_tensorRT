@@ -26,7 +26,7 @@ int main()
     // USER DEFINED VALUES
     const string uffFile="../facenetModels/facenet.uff";
     const string engineFile="../facenetModels/facenet.engine";
-    DataType dtype = DataType::kHALF;       // ToDo calibrator for INT8
+    DataType dtype = DataType::kHALF;
     //DataType dtype = DataType::kFLOAT;
     bool serializeEngine = true;
     int batchSize = 1;

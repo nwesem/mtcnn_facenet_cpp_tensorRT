@@ -9,6 +9,12 @@ layer of the FaceNet model. Link to the repo:
 Moreover, this project uses an adapted version of [PKUZHOU's implementation](https://github.com/PKUZHOU/MTCNN_FaceDetection_TensorRT)
 of the mtCNN for face detection. More info below.
 
+## Hardware
+* NVIDIA Jetson Nano
+* Raspberry Pi v2 camera 
+
+If you want to use a USB camera instead of Raspi Camera set the boolean _isCSICam_ to false in [main.cpp](./src/main.cpp).
+
 
 ## Dependencies
 cuda 10.0 + cudnn 7.5 <br> TensorRT 5.1.x <br> OpenCV 3.x <br>
@@ -114,6 +120,8 @@ Performance on **NVIDIA Jetson AGX Xavier**:
 ## License
 Please respect all licenses of OpenCV and the data the machine learning models (mtCNN and Google FaceNet)
 were trained on.
+
+
 
 ## Info
 Niclas Wesemann <br>
