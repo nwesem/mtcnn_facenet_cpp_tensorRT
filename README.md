@@ -69,20 +69,25 @@ can be used as input to my FaceNet TensorRT implementation.
 You will need all models from the repo in the [mtCNNModels](./mtCNNModels) folder so please do this 
 to download them:
 ```bash
-cd path/to/project/mtCNNModels
-wget https://github.com/PKUZHOU/MTCNN_FaceDetection_TensorRT/blob/master/det1_relu.caffemodel
-wget https://github.com/PKUZHOU/MTCNN_FaceDetection_TensorRT/blob/master/det1_relu.prototxt
-wget https://github.com/PKUZHOU/MTCNN_FaceDetection_TensorRT/blob/master/det2_relu.caffemodel
-wget https://github.com/PKUZHOU/MTCNN_FaceDetection_TensorRT/blob/master/det2_relu.prototxt
-wget https://github.com/PKUZHOU/MTCNN_FaceDetection_TensorRT/blob/master/det3_relu.caffemodel
-wget https://github.com/PKUZHOU/MTCNN_FaceDetection_TensorRT/blob/master/det3_relu.prototxt
+# go to one above project,
+cd path/to/project/..
+# clone PKUZHOUs repo,
+git clone https://github.com/PKUZHOU/MTCNN_FaceDetection_TensorRT
+# and move models into mtCNNModels folder
+mv MTCNN_FaceDetection_TensorRT/det* path/to/project/mtCNNModels
 ```
+After doing so you should have the following files in your [mtCNNModels](./mtCNNModels) folder:<br>
+* det1_relu.caffemodel
+* det1_relu.prototxt
+* det2_relu.caffemodel
+* det2_relu.prototxt
+* det3_relu.caffemodel
+* det3_relu.prototxt
+* README.md
+
 Done you are ready to build the project!
 
 #### 5. Build the project
-_NOTE:_ This step might take a while when done the first time. TensorRT
-now parses and serializes the model from .uff to a runtime engine
-(.engine file). 
 ```bash
 mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -105,6 +110,10 @@ you have opened your terminal and put in the name of the person you want to add.
 ./mtcnn_facenet_cpp_tensorRT
 ```
 Press "**Q**" to quit and to show the stats (fps).
+
+_NOTE:_ This step might take a while when done the first time. TensorRT
+now parses and serializes the model from .uff to a runtime engine
+(.engine file). 
 
 ## Performance
 Performance on **NVIDIA Jetson Nano**
