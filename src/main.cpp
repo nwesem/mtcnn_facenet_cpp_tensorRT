@@ -112,6 +112,7 @@ int main()
     }
     auto globalTimeEnd = chrono::steady_clock::now();
     cv::destroyAllWindows();
+    videoStreamer.release();
     auto milliseconds = chrono::duration_cast<chrono::milliseconds>(globalTimeEnd-globalTimeStart).count();
     double seconds = double(milliseconds)/1000.;
     double fps = nbFrames/seconds;

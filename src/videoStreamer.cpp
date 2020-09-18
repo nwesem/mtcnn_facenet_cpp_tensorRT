@@ -66,6 +66,10 @@ std::string VideoStreamer::gstreamer_pipeline (int capture_width, int capture_he
            std::to_string(display_height) + ", format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink";
 }
 
+void VideoStreamer::release() {
+	m_capture->release();
+}
+
 VideoStreamer::~VideoStreamer() {
 	std::cout << "VideoStreamer was destructed" << std::endl;
 }
