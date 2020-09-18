@@ -71,7 +71,8 @@ int main()
     while (true) {
         videoStreamer.getFrame(frame);
         if (frame.empty()) {
-            std::cout << "Empty frame! Exiting..." << std::endl;
+            std::cout << "Empty frame! Exiting...\n Try restarting nvargus-daemon by "
+                         "doing: sudo systemctl restart nvargus-daemon" << std::endl;
             break;
         }
         auto startMTCNN = chrono::steady_clock::now();
@@ -111,6 +112,7 @@ int main()
     }
     auto globalTimeEnd = chrono::steady_clock::now();
     cv::destroyAllWindows();
+    videoStreamer.release();
     auto milliseconds = chrono::duration_cast<chrono::milliseconds>(globalTimeEnd-globalTimeStart).count();
     double seconds = double(milliseconds)/1000.;
     double fps = nbFrames/seconds;

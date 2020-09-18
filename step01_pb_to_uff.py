@@ -8,7 +8,7 @@ if __name__ == "__main__":
   output_nodes = ["embeddings"]
   input_node   = "input"
   pb_file      = "./facenet.pb"
-  uff_file     = "./facenet.uff"
+  uff_file     = "./facenetModels/facenet.uff"
   # END USER DEFINED VALUES
 
   # read tensorflow graph

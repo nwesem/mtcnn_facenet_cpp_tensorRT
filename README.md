@@ -17,21 +17,44 @@ If you want to use a USB camera instead of Raspi Camera set the boolean _isCSICa
 
 
 ## Dependencies
-cuda 10.0 + cudnn 7.5 <br> TensorRT 5.1.x <br> OpenCV 3.x <br>
+cuda 10.2 + cudnn 8.0 <br> TensorRT 7.x <br> OpenCV 4.1.1 <br>
 TensorFlow r1.14 (for Python to convert model from .pb to .uff)
+
+## Update
+This master branch now uses Jetpack 4.4, so dependencies have slightly changed and tensorflow is not preinstalled anymore. So there is an extra step that takes a few minutes more than before. <br>
+In case you would like to use older versions of Jetpack there is a tag jp4.2.2, that can links to the older implementation.
 
 ## Installation
 #### 1. Install Cuda, CudNN, TensorRT, and TensorFlow for Python 
 You can check [NVIDIA website](https://developer.nvidia.com/) for help.
 Installation procedures are very well documented.<br><br>**If you are
-using NVIDIA Jetson (Nano, TX1/2, Xavier) with Jetpack 4.2.2**, all needed packages
+using NVIDIA Jetson (Nano, TX1/2, Xavier) with Jetpack 4.4**, most needed packages
 should be installed if the Jetson was correctly flashed using SDK
-Manager, you will only need to install cmake and openblas:
+Manager or the SD card image, you will only need to install cmake, openblas and tensorflow:
 ```bash
-sudo apt-get install cmake libopenblas-dev
+sudo apt install cmake libopenblas-dev
+```
+#### 2. Install Tensorflow
+The following shows the steps to install Tensorflow for Jetpack 4.4. This was copied from the official [NVIDIA documentation](https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform/index.html). I'm assuming you don't need to install it in a virtual environment. If yes, please refer to the documentation linked above. If you are not installing this on a jetson, please refer to the official tensorflow documentation.
+
+```bash
+# Install system packages required by TensorFlow:
+sudo apt update
+sudo apt install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
+
+# Install and upgrade pip3
+sudo apt install python3-pip
+sudo pip3 install -U pip testresources setuptools
+
+# Install the Python package dependencies
+sudo pip3 install -U numpy==1.16.1 future==0.18.2 mock==3.0.5 h5py==2.10.0 keras_preprocessing==1.1.1 keras_applications==1.0.8 gast==0.2.2 futures protobuf pybind11
+
+# Install TensorFlow using the pip3 command. This command will install the latest version of TensorFlow compatible with JetPack 4.4.
+sudo pip3 install --pre --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v44 'tensorflow<2'
 ```
 
-#### 2. Prune and freeze TensorFlow model or get frozen model in the link
+
+#### 3. Prune and freeze TensorFlow model or get frozen model in the link
 The inputs to the original model are an input tensor consisting of a
 single or multiple faces and a phase train tensor telling all batch
 normalisation layers that model is not in train mode. Batch
@@ -43,7 +66,7 @@ to model where the phase train tensor has already been removed from the
 saved model
 [github.com/apollo-time/facenet/raw/master/model/resnet/facenet.pb](https://github.com/apollo-time/facenet/raw/master/model/resnet/facenet.pb)
 
-#### 3. Convert frozen protobuf (.pb) model to UFF
+#### 4. Convert frozen protobuf (.pb) model to UFF
 Use the convert-to-uff tool which is installed with tensorflow
 installation to convert the *.pb model to *.uff. The script will replace
 unsupported layers with custom layers implemented by
@@ -55,10 +78,7 @@ TRT_L2NORM_HELPER plugin.
 cd path/to/project
 python3 step01_pb_to_uff.py
 ```
-You should now have a facenet.uff (or similar) file which will be used
-as the input model to TensorRT. <br>
-The path to model is hardcoded, so please put the __facenet.uff__ in the
-[facenetModels](./facenetModels) directory.
+You should now have a facenet.uff file in the [facenetModels folder](./facenetModels) which will be used as the input model to TensorRT. <br>
 
 
 #### 4. Get mtCNN models
@@ -130,7 +150,11 @@ Performance on **NVIDIA Jetson AGX Xavier**:
 Please respect all licenses of OpenCV and the data the machine learning models (mtCNN and Google FaceNet)
 were trained on.
 
-
+## FAQ
+Sometimes the camera driver doesn't close properly that means you will have to restart the __nvargus-daemon__:
+```bash
+sudo systemctl restart nvargus-daemon
+``` 
 
 ## Info
 Niclas Wesemann <br>

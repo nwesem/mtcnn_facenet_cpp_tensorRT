@@ -43,7 +43,7 @@ void FaceNetClassifier::createOrLoadEngine() {
             file.read(trtModelStream_.data(), size);
             file.close();
         }
-        std::cout << "size" << size;
+        // std::cout << "size" << size;
         IRuntime* runtime = createInferRuntime(m_gLogger);
         assert(runtime != nullptr);
         m_engine = runtime->deserializeCudaEngine(trtModelStream_.data(), size, nullptr);
@@ -125,7 +125,7 @@ void FaceNetClassifier::preprocessFaces() {
     // preprocess according to facenet training and flatten for input to runtime engine
     for (int i = 0; i < m_croppedFaces.size(); i++) {
         //mean and std
-        cv::cvtColor(m_croppedFaces[i].faceMat, m_croppedFaces[i].faceMat, CV_RGB2BGR);
+        cv::cvtColor(m_croppedFaces[i].faceMat, m_croppedFaces[i].faceMat, cv::COLOR_RGB2BGR);
         cv::Mat temp = m_croppedFaces[i].faceMat.reshape(1, m_croppedFaces[i].faceMat.rows * 3);
         cv::Mat mean3;
         cv::Mat stddev3;
@@ -256,10 +256,10 @@ void FaceNetClassifier::resetVariables() {
 }
 
 FaceNetClassifier::~FaceNetClassifier() {
-    // this leads to segfault if engine or context could not be created during class instantiation
-    this->m_engine->destroy();
-    this->m_context->destroy();
-    std::cout << "FaceNet was destructed" << std::endl;
+    // this leads to segfault 
+    // this->m_engine->destroy();
+    // this->m_context->destroy();
+    // std::cout << "FaceNet was destructed" << std::endl;
 }
 
 
