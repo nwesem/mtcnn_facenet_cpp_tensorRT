@@ -71,7 +71,8 @@ int main()
     while (true) {
         videoStreamer.getFrame(frame);
         if (frame.empty()) {
-            std::cout << "Empty frame! Exiting..." << std::endl;
+            std::cout << "Empty frame! Exiting...\n Try restarting nvargus-daemon by "
+                         "doing: sudo systemctl restart nvargus-daemon" << std::endl;
             break;
         }
         auto startMTCNN = chrono::steady_clock::now();

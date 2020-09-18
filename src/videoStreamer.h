@@ -18,6 +18,7 @@ private:
 public:
     VideoStreamer(int nmbrDevice, int videoWidth, int videoHeight, int frameRate, bool isCSICam);
     VideoStreamer(std::string filename, int videoWidth, int videoHeight);
+    ~VideoStreamer();
     void setResolutionDevice(int width, int height);
     void setResoltionFile(int width, int height);
     void assertResolution();
