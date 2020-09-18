@@ -63,7 +63,6 @@ mtcnn::mtcnn(int row, int col){
 
 mtcnn::~mtcnn(){
     //delete []simpleFace_;
-    std::cout << "mtcnn was destructed" << std::endl;
 }
 
 vector<struct Bbox> mtcnn::findFace(cv::Mat &image){

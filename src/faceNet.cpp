@@ -256,10 +256,10 @@ void FaceNetClassifier::resetVariables() {
 }
 
 FaceNetClassifier::~FaceNetClassifier() {
-    // this leads to segfault if engine or context could not be created during class instantiation
+    // this leads to segfault 
     // this->m_engine->destroy();
     // this->m_context->destroy();
-    std::cout << "FaceNet was destructed" << std::endl;
+    // std::cout << "FaceNet was destructed" << std::endl;
 }
 
 

@@ -71,5 +71,5 @@ void VideoStreamer::release() {
 }
 
 VideoStreamer::~VideoStreamer() {
-	std::cout << "VideoStreamer was destructed" << std::endl;
+	
 }
