@@ -85,7 +85,7 @@ CUDA_VER=10.2 make -C nvdsinfer_custom_impl_Yolo
 
 Download the weights, cfg and labels files from [this](https://github.com/lthquy/Yolov3-tiny-Face-weights) repo. place the .weights and .cfg file in /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo, after that make a labels.txt file consisting of one class 'Face'.
 
-#if thr below files are already existing in your workspace please move them to /bkp and move these files in /objectDetector_Yolo
+if the below mentioned files are already existing in your workspace please move them to /bkp and move these files in /objectDetector_Yolo
 ```bash
 cd /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 
@@ -108,7 +108,9 @@ deepstream-app -c ./deepstream_app_config_yoloV3_tiny.txt
 change the [source](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/81a3cad4efa76eea9f98e96dfd5540f341107068/YoloApp/deepstream_app_config_yoloV3_tiny.txt#L47) in case you want to test on some other video
 
 ## Prepare FaceNet
-This step relies on [this]() repo. I couldn't make things work using this fork, hence I've made some modifications to keep things rolling.
+This step relies on [this]() repo. I couldn't make things work using this repo. for more info follow [this](https://github.com/riotu-lab/deepstream-facenet/issues/5) issue hence I've made some modifications to keep things rolling.
+
+
 First, download the keras model of Facenet from [this](https://github.com/nyoki-mtl/keras-facenet) fork and place it in /mtcnn_facenet_cpp_tensorRT/ModelConverion/KerasModel
 
 ```bash
@@ -116,7 +118,7 @@ First, download the keras model of Facenet from [this](https://github.com/nyoki-
 cd ./mtcnn_facenet_cpp_tensorRT/ModelConversion
 python3 h5topb.py --input_path ./kerasmodel/facenet_keras_128.h5 --output_path ./tensorflowmodel/facenet.pb
 
-#Convert Tensorflow model to an ONNX model
+#Convert Tensorflow model to an ONNX model. This will take approx 50 mins and this has to be done on the host device
 python3 -m tf2onnx.convert --input ./tensorflowmodel/facenet_freezed.pb --inputs input_1:0[1,160,160,3] --inputs-as-nchw input_1:0 --outputs Bottleneck_BatchNorm/batchnorm_1/add_1:0 --output onnxmodel/facenetconv.onnx
 
 #Convert ONNX model to a model that can take dynamic input size
