@@ -96,6 +96,7 @@ git clone -b develop --single-branch https://github.com/shubham-shahh/mtcnn_face
 cd ./mtcnn_facenet_cpp_tensorRT/YoloApp
 cp ./deepstream_app_config_yoloV3_tiny.txt /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 cp ./config_infer_primary_yoloV3_tiny.txt /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
+cp ./dstest2_pgie_config.txt /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 
 ```
 add names or paths of the respective files based on your config [here](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/81a3cad4efa76eea9f98e96dfd5540f341107068/YoloApp/config_infer_primary_yoloV3_tiny.txt#L65-L68) once everything is in place we can test our app.

@@ -60,10 +60,8 @@
 [property]
 gpu-id=0
 net-scale-factor=0.0093215686274
-#onnx-file=/home/jetson-nx/code/tf2trt_with_onnx/facenet-order-opset.onnx
-onnx-file=/opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps/deepstream-facenet/models/dynamic_model.onnx
-#model-engine-file=/home/jetson-nx/code/tf2trt_with_onnx/facenet_order.plan
-#model-engine-file=/opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps/#deepstream-facenet/models/facenet_engine.plan
+onnx-file=/opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps/facenet-python/facenetmodel/dynamicfacenetmodel.onnx
+#model-engine-file=/opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps/facenet-python/facenetmodel/facenet_engine.plan
 #input-dims=3;160;160;0
 #infer-dims=3;160;160;1
 #uff-input-blob-name=input_1
