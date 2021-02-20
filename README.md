@@ -136,6 +136,23 @@ cd ./mtcnn_facenet_cpp_tensorRT
 cp -r ./facenet-python /opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps
 
 ```
+Now, change the [paths](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/baac7f037a0767f7061c075556937c1655fe0db8/facenet-python/deepstream_facenet.py#L326-L327) of required files based on your environment to start the app.
+
+[this](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/361a1682c9a01ab0f8b974f3af486f12bbb0a96f/facenet-python/dstest2_sgie1_config.txt#L63) as well.
+
+```bash
+#Start the app
+python3 deepstream_facenet.py ./testvideo.264
+
+```
+[this](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/baac7f037a0767f7061c075556937c1655fe0db8/facenet-python/deepstream_facenet.py#L223) line prints the 128d vector which is the output of the Facenet model. you can compare this vector with the the embeddings of known people and can infer if there is a match or not. 
+
+[this](https://www.pyimagesearch.com/2018/06/18/face-recognition-with-opencv-python-and-deep-learning/) tutorial shows for Dlib model but similar approach can be used here. 
+
+This app supports .H264 files, if you want to use .mp4, RTSP, or USB webcams refer the deepstream-python-apps, in different test apps, different Gstream pipelines are demonstrated. This example is based on deepstream test-app-2
+
+
+
 
 
 
@@ -147,4 +164,4 @@ cp -r ./facenet-python /opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_
 
 page under maintainence
 
-cp -r /opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps/tf2trt_with_onnx/test /opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps
+
