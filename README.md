@@ -27,6 +27,8 @@ deepstream-app -c /opt/nvidia/deepstream/deepstream-5.0/samples/configs/deepstre
 ```
 If this app runs fine, we can proceed to next steps, In case you are facing issues while running the sample app please refer [Deepstream SDK forums](https://forums.developer.nvidia.com/c/accelerated-computing/intelligent-video-analytics/deepstream-sdk/15)
 
+Follow [this](https://github.com/NVIDIA-AI-IOT/deepstream_python_apps/blob/master/HOWTO.md) guide to install DeepStream-Python-Apps 
+
 #### 2. Install Tensorflow
 The following shows the steps to install Tensorflow for Jetpack 4.4. This was copied from the official [NVIDIA documentation](https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform/index.html). I'm assuming you don't need to install it in a virtual environment. If yes, please refer to the documentation linked above. If you are not installing this on a jetson, please refer to the official tensorflow documentation.
 
@@ -34,6 +36,7 @@ The following shows the steps to install Tensorflow for Jetpack 4.4. This was co
 # Install system packages required by TensorFlow:
 sudo apt update
 sudo apt install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran
+sudo apt-get install libprotobuf-dev protobuf-compiler
 
 # Install and upgrade pip3
 sudo apt install python3-pip
@@ -82,7 +85,11 @@ CUDA_VER=10.2 make -C nvdsinfer_custom_impl_Yolo
 
 #if these files are already existing in your workspace please move them to /bkp and move these files in /objectDetector_Yolo
 cd /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
+
+#clone develop branch of this repo
 git clone -b develop --single-branch https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT.git
+
+#copy config files for reference
 cd ./mtcnn_facenet_cpp_tensorRT/YoloApp
 cp ./deepstream_app_config_yoloV3_tiny.txt /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 cp ./config_infer_primary_yoloV3_tiny.txt /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
@@ -96,6 +103,28 @@ cd /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 deepstream-app -c ./deepstream_app_config_yoloV3_tiny.txt
 ```
 change the [source](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/81a3cad4efa76eea9f98e96dfd5540f341107068/YoloApp/deepstream_app_config_yoloV3_tiny.txt#L47) in case you want to test on some other video
+
+## Prepare FaceNet
+This step relies on [this]() repo. I couldn't make things work using this fork, hence I've made some modifications to keep things rolling.
+First, download the keras model of Facenet from [this](https://github.com/nyoki-mtl/keras-facenet) fork and place it in /mtcnn_facenet_cpp_tensorRT/ModelConverion/KerasModel
+
+```bash
+#Test if we properly configured YOLO to run with Deepstream
+cd ./mtcnn_facenet_cpp_tensorRT/ModelConversion
+python3 h5topb.py --input_path ./kerasmodel/facenet_keras_128.h5 --output_path ./tensorflowmodel/facenet.pb
+
+#Convert Tensorflow model to an ONNX model
+python3 -m tf2onnx.convert --input ./tensorflowmodel/facenet_freezed.pb --inputs input_1:0[1,160,160,3] --inputs-as-nchw input_1:0 --outputs Bottleneck_BatchNorm/batchnorm_1/add_1:0 --output onnxmodel/facenetconv.onnx
+
+#Convert ONNX model to a model that can take dynamic input size
+python3 dynamic_conv.py --input_path ./onnxmodel/facenetconv.onnx --output_path ./dynamiconnxmodel/dynamiconnxmodel.onnx
+
+```
+
+
+
+
+
 
 
 
