@@ -126,6 +126,8 @@ python3 -m tf2onnx.convert --input ./tensorflowmodel/facenet_freezed.pb --inputs
 python3 dynamic_conv.py --input_path ./onnxmodel/facenetconv.onnx --output_path ./dynamiconnxmodel/dynamicfacenetmodel.onnx
 
 ```
+
+## Python Implementation
 Once we have the dynamic onnx model copy it to /mtcnn_facenet_cpp_tensorRT/facenet-python/facenetmodel
 ```bash
 cd ./mtcnn_facenet_cpp_tensorRT/ModelConversion/dynamiconnxmodel/
@@ -174,11 +176,11 @@ shape:  128
  -0.47283262 -0.3241306 ]
 ```
 
-[this](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/baac7f037a0767f7061c075556937c1655fe0db8/facenet-python/deepstream_facenet.py#L223) line prints the 128d vector which is the output of the Facenet model. you can compare this vector with the the embeddings of known people and can infer if there is a match or not. 
+[This](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/baac7f037a0767f7061c075556937c1655fe0db8/facenet-python/deepstream_facenet.py#L223) line prints the 128d vector which is the output of the Facenet model. you can compare this vector with the the embeddings of known people and can infer if there is a match or not. 
 
-[this](https://www.pyimagesearch.com/2018/06/18/face-recognition-with-opencv-python-and-deep-learning/) tutorial shows for Dlib model but similar approach can be used here. 
+[This](https://www.pyimagesearch.com/2018/06/18/face-recognition-with-opencv-python-and-deep-learning/) tutorial shows how to make a pickle file of known embeddings and compare them with the ones recived from the model in real time.
 
-This app supports .H264 files, if you want to use .mp4, RTSP, or USB webcams refer the deepstream-python-apps, in different test apps, different Gstream pipelines are demonstrated. This example is based on deepstream test-app-2
+The current implementation supports .H264 files, if you want to use .mp4, RTSP, or USB webcams refer the deepstream-python-apps, in different test apps, different Gstream pipelines are demonstrated. This example is based on deepstream test-app-2
 
 
 
