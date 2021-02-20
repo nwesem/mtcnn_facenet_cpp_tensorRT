@@ -54,7 +54,7 @@ sudo pip3 install --pre --extra-index-url https://developer.download.nvidia.com/
 ```
 
 
-#### 3. Prepare Face detector
+## Prepare Face detector
 First, we make some changes so that we can use YOLO with DeepStream. Either provide the deepstream folder the read and write permissions or use the commangs with sudo
 ```bash
 #navigating to target folder
@@ -83,18 +83,19 @@ CUDA_VER=10.2 make -C nvdsinfer_custom_impl_Yolo
 #if these files are already existing in your workspace please move them to /bkp and move these files in /objectDetector_Yolo
 cd /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 git clone -b develop --single-branch https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT.git
-cd ./mtcnn_facenet_cpp_tensorRT
+cd ./mtcnn_facenet_cpp_tensorRT/YoloApp
 cp ./deepstream_app_config_yoloV3_tiny.txt /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 cp ./config_infer_primary_yoloV3_tiny.txt /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 
-
-
-
-
-
-
 ```
+add names or paths of the respective files based on your config [here](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/81a3cad4efa76eea9f98e96dfd5540f341107068/YoloApp/config_infer_primary_yoloV3_tiny.txt#L65-L68) once everything is in place we can test our app.
 
+```bash
+#Test if we properly configured YOLO to run with Deepstream
+cd /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
+deepstream-app -c ./deepstream_app_config_yoloV3_tiny.txt
+```
+change the [source](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/81a3cad4efa76eea9f98e96dfd5540f341107068/YoloApp/deepstream_app_config_yoloV3_tiny.txt#L47) in case you want to test on some other video
 
 
 
