@@ -122,7 +122,17 @@ python3 h5topb.py --input_path ./kerasmodel/facenet_keras_128.h5 --output_path .
 python3 -m tf2onnx.convert --input ./tensorflowmodel/facenet_freezed.pb --inputs input_1:0[1,160,160,3] --inputs-as-nchw input_1:0 --outputs Bottleneck_BatchNorm/batchnorm_1/add_1:0 --output onnxmodel/facenetconv.onnx
 
 #Convert ONNX model to a model that can take dynamic input size
-python3 dynamic_conv.py --input_path ./onnxmodel/facenetconv.onnx --output_path ./dynamiconnxmodel/dynamiconnxmodel.onnx
+python3 dynamic_conv.py --input_path ./onnxmodel/facenetconv.onnx --output_path ./dynamiconnxmodel/dynamicfacenetmodel.onnx
+
+```
+Once we have the dynamic onnx model copy it to /mtcnn_facenet_cpp_tensorRT/facenet-python/facenetmodel
+```bash
+cd ./mtcnn_facenet_cpp_tensorRT/ModelConversion/dynamiconnxmodel/
+cp ./dynamicfacenetmodel.onnx  /path/to/mtcnn_facenet_cpp_tensorRT/facenet-python/facenetmodel
+
+#Now, copy the facenet-python model to /opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps
+cd ./mtcnn_facenet_cpp_tensorRT
+cp -r ./facenet-python /opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps
 
 ```
 
@@ -133,4 +143,7 @@ python3 dynamic_conv.py --input_path ./onnxmodel/facenetconv.onnx --output_path 
 
 
 
+
 page under maintainence
+
+cp -r /opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps/tf2trt_with_onnx/test /opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps

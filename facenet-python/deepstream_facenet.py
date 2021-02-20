@@ -191,10 +191,9 @@ def sgie_sink_pad_buffer_probe(pad,info,u_data):
                 break
 
             l_user = obj_meta.obj_user_meta_list
-            ##print(f'obj_meta.obj_user_meta_listtttttt {l_user}')
+            
             while l_user is not None:
-                ##print('Inside l_userssss = obj_meta.obj_user_meta_list Loop')
-                #pass
+        
                 try:
             #         # Casting l_obj.data to pyds.NvDsObjectMeta
                      user_meta=pyds.NvDsUserMeta.cast(l_user.data)
@@ -221,7 +220,7 @@ def sgie_sink_pad_buffer_probe(pad,info,u_data):
                      ptr = ctypes.cast(pyds.get_ptr(layer.buffer), ctypes.POINTER(ctypes.c_float))
                      probs = np.array(np.ctypeslib.as_array(ptr, shape=(layer.dims.numElements,)), copy=True)
                      print("shape: ",layer.dims.numElements)
-                     print("aaaaaaaa",probs)
+                     print("128d tensor",probs)
                      ##print(f'Layer: {i}, Layer name: {layer.layerName}')
 
                 try:
@@ -326,31 +325,6 @@ def main(args):
     #Set properties of pgie and sgie
     pgie.set_property('config-file-path', "/opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo/dstest2_pgie_config.txt")
     sgie1.set_property('config-file-path', "dstest2_sgie1_config.txt")
-
-    #Set properties of tracker
-    #config = configparser.ConfigParser()
-    #config.read('dstest2_tracker_config.txt')
-    #config.sections()
-
-    #for key in config['tracker']:
-        #if key == 'tracker-width' :
-            #tracker_width = config.getint('tracker', key)
-            #tracker.set_property('tracker-width', tracker_width)
-        #if key == 'tracker-height' :
-            #tracker_height = config.getint('tracker', key)
-            #tracker.set_property('tracker-height', tracker_height)
-        #if key == 'gpu-id' :
-            #tracker_gpu_id = config.getint('tracker', key)
-            #tracker.set_property('gpu_id', tracker_gpu_id)
-        #if key == 'll-lib-file' :
-            #tracker_ll_lib_file = config.get('tracker', key)
-            #tracker.set_property('ll-lib-file', tracker_ll_lib_file)
-        #if key == 'll-config-file' :
-            #tracker_ll_config_file = config.get('tracker', key)
-            #tracker.set_property('ll-config-file', tracker_ll_config_file)
-        #if key == 'enable-batch-process' :
-            #tracker_enable_batch_process = config.getint('tracker', key)
-            #tracker.set_property('enable_batch_process', tracker_enable_batch_process)
 
     print("Adding elements to Pipeline \n")
     pipeline.add(source)
