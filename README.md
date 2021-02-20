@@ -80,10 +80,13 @@ cd /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 
 CUDA_VER=10.2 make -C nvdsinfer_custom_impl_Yolo
 
+```
 
-#Download the weights, cfg and labels files from [this](https://github.com/lthquy/Yolov3-tiny-Face-weights) repo. place the .weights and .cfg file in /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo, after that make a labels.txt file consisting of one class 'Face'.
 
-#if these files are already existing in your workspace please move them to /bkp and move these files in /objectDetector_Yolo
+Download the weights, cfg and labels files from [this](https://github.com/lthquy/Yolov3-tiny-Face-weights) repo. place the .weights and .cfg file in /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo, after that make a labels.txt file consisting of one class 'Face'.
+
+#if thr below files are already existing in your workspace please move them to /bkp and move these files in /objectDetector_Yolo
+```bash
 cd /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 
 #clone develop branch of this repo
