@@ -372,28 +372,18 @@ sgie_pad_buffer_probe (GstPad * pad, GstPadProbeInfo * info, gpointer u_data)
           
           info->buffer = meta->out_buf_ptrs_host[i];
           float (*array)[130] = (float (*)[130]) info->buffer;
-          //int k = sizeof(*array);
 
-          //int len = sizeof(meta->out_buf_ptrs_host)/sizeof(meta->out_buf_ptrs_host[0]);
-          //(void) *cmap_data = meta->out_buf_ptrs_host[i];
           std::cout<<"Shape "<<info->inferDims.numElements<<std::endl;
           std::cout<<"128d Tensor"<<std::endl;
           for(int m =0;m<info->inferDims.numElements;m++){
           std::cout<<" "<< (*array)[m];
           }
-          //std::cout<<"outside for"<<std::endl;
-          //std::cout<<"gg"<<len<<std::endl;
-          //std::cout<<"gg"<<info->inferDims.numElements<<std::endl; 128
-          //std::cout<<"gg"<<*(float *)meta->output_layers_info[0].buffer;
-
           //double* ptr = (double*)meta->out_buf_ptrs_host[0];  // output layer 0
           //for( size_t i=0; i<info->inferDims.numElements; i++ )
           //{
             //std::cout << "Tensor " << i << ": " << ptr[i] << std::endl;
             //std::cout  << i << ": " << ptr[i];
            // }
-
-          std::cout<<"outside for"<<std::endl;
           
           if (use_device_mem && meta->out_buf_ptrs_dev[i]) {
             cudaMemcpy (meta->out_buf_ptrs_host[i], meta->out_buf_ptrs_dev[i],
@@ -468,9 +458,8 @@ sgie_pad_buffer_probe (GstPad * pad, GstPadProbeInfo * info, gpointer u_data)
       }
      
     }
-     //std::cout<<"complete\n"<<std::endl;
+  
   }
-  //std::cout<<"zz\n"<<std::endl;
 
   use_device_mem = 1 - use_device_mem;
   return GST_PAD_PROBE_OK;
@@ -616,11 +605,6 @@ create_source_bin (guint index, gchar * uri)
 
   return bin;
 }
-
-
-
-
-
 int
 main (int argc, char *argv[])
 {

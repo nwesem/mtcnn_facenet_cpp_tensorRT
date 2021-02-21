@@ -185,25 +185,59 @@ shape:  128
 
 ## C++ Implementation
 
-For running FaceNet with C++ Deepstream app, First
+* For running FaceNet with C++ Deepstream app, First test the sample app in its default configuration
 
+```bash
+#Move to sample app directory
+cd /opt/nvidia/deepstream/deepstream-5.0/sources/apps/sample_apps/deepstream-infer-tensor-meta-test
+
+#build
+CUDA_VER = 10.2 make
+
+#Run test app
+./deepstream-infer-tensor-meta-app -t infer /opt/nvidia/deepstream/deepstream-5.0/samples/streams/sample_720p.mp4
+
+```
+* If the App runs fine, we can proceed with the next steps
+
+```bash
+#Make sure we are in the same directory
+cd /opt/nvidia/deepstream/deepstream-5.0/sources/apps/sample_apps/deepstream-infer-tensor-meta-test
+
+#create a backup folder
+mkdir ./bkp
+
+#move the sample app to the backup folder
+mv ./deepstream_infer_tensor_meta_test.cpp ./bkp
+
+#copy the custom app to this directory
+cp /path/to/mtcnn_facenet_cpp_tensorRT/facenet-cpp/deepstream_infer_tensor_meta_test.cpp /opt/nvidia/deepstream/deepstream-5.0/sources/apps/sample_apps/deepstream-infer-tensor-meta-test
+
+#copy the custom sgie file to the directory
+cp /path/to/mtcnn_facenet_cpp_tensorRT/facenet-python/dstest2_sgie1_config.txt /opt/nvidia/deepstream/deepstream-5.0/sources/apps/sample_apps/deepstream-infer-tensor-meta-test
+
+#move to target folder
+cd
+/opt/nvidia/deepstream/deepstream-5.0/sources/apps/sample_apps/deepstream-infer-tensor-meta-test
+
+#Build with new changes
+CUDA_VER = 10.2 make
+
+#Run the App
+
+./deepstream-infer-tensor-meta-app ./any-mp4-video-file
+
+```
+#### Output
 
 ```ini
 Shape 128
 128d Tensor
- 0.267679 -0.251554 -0.260311 -0.223737 0.319461 0.119369 -0.0708687 -0.221111 0.267715 -0.0990431 0.141647 -0.297575 -0.142546 -0.526927 0.163986 -0.0697501 0.595039 -0.607409 0.244937 -0.193974 -0.268592 0.0620347 -0.845466 0.308341 0.0138658 -0.0437872 0.511274 0.0900756 -0.24564 0.108228 0.408589 0.172266 0.120605 -0.149561 0.227818 -0.182969 0.160609 0.0315109 0.545435 0.293824 0.155773 0.25595 -0.0702008 -0.366996 -0.782633 -0.414467 -0.046183 0.0648381 0.299499 0.0560513 0.326161 0.13931 0.529288 -0.562848 0.376559 0.338937 0.164113 -0.272101 -0.0265516 -0.552251 -0.194472 -0.344293 0.149408 0.960968 0.282589 0.415575 0.12719 0.00664066 0.0597391 -0.0656708 0.254978 -0.845805 0.623282 -0.711394 -0.207582 0.21915 0.0530824 0.540761 -0.331404 -0.380826 -0.508088 -0.118071 0.025195 0.608881 0.216518 -0.262486 0.522583 -0.626702 -0.64167 0.615544 0.364192 0.103187 -0.506685 -0.0775325 0.406819 -0.00199352 0.256417 -0.283961 -0.615214 0.268594 -0.229041 0.60271 0.223027 0.0621645 0.132152 -0.00342648 -0.176054 -0.0365441 -0.267923 -0.77549 0.175019 -0.0819169 0.398986 0.301 -0.029393 0.063587 -0.306683 0.719321 0.56422 0.190449 -0.0865007 -0.501071 0.14652 0.157381 0.187478 -0.450476 0.0641025 -0.0103367outside for
+ 0.267679 -0.251554 -0.260311 -0.223737 0.319461 0.119369 -0.0708687 -0.221111 0.267715 -0.0990431 0.141647 -0.297575 -0.142546 -0.526927 0.163986 -0.0697501 0.595039 -0.607409 0.244937 -0.193974 -0.268592 0.0620347 -0.845466 0.308341 0.0138658 -0.0437872 0.511274 0.0900756 -0.24564 0.108228 0.408589 0.172266 0.120605 -0.149561 0.227818 -0.182969 0.160609 0.0315109 0.545435 0.293824 0.155773 0.25595 -0.0702008 -0.366996 -0.782633 -0.414467 -0.046183 0.0648381 0.299499 0.0560513 0.326161 0.13931 0.529288 -0.562848 0.376559 0.338937 0.164113 -0.272101 -0.0265516 -0.552251 -0.194472 -0.344293 0.149408 0.960968 0.282589 0.415575 0.12719 0.00664066 0.0597391 -0.0656708 0.254978 -0.845805 0.623282 -0.711394 -0.207582 0.21915 0.0530824 0.540761 -0.331404 -0.380826 -0.508088 -0.118071 0.025195 0.608881 0.216518 -0.262486 0.522583 -0.626702 -0.64167 0.615544 0.364192 0.103187 -0.506685 -0.0775325 0.406819 -0.00199352 0.256417 -0.283961 -0.615214 0.268594 -0.229041 0.60271 0.223027 0.0621645 0.132152 -0.00342648 -0.176054 -0.0365441 -0.267923 -0.77549 0.175019 -0.0819169 0.398986 0.301 -0.029393 0.063587 -0.306683 0.719321 0.56422 0.190449 -0.0865007 -0.501071 0.14652 0.157381 0.187478 -0.450476 0.0641025 -0.0103367
 
 ```
 
+*This app can support .Mp4 format, to run this app with USB Webcams and RTSP stream, check the pipelines of other sample Deepstream Apps and make changes.
 
-
-
-
-
-
-
-
-
-page under maintainence
 
 
