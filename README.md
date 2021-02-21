@@ -58,7 +58,7 @@ sudo pip3 install --pre --extra-index-url https://developer.download.nvidia.com/
 
 
 ## Prepare Face detector
-First, we make some changes so that we can use YOLO with DeepStream. Either provide the deepstream folder the read and write permissions or use the commangs with sudo
+* First, we make some changes so that we can use YOLO with DeepStream. Either provide the deepstream folder the read and write permissions or use the commangs with sudo
 ```bash
 #navigating to target folder
 cd /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
@@ -83,9 +83,9 @@ CUDA_VER=10.2 make -C nvdsinfer_custom_impl_Yolo
 ```
 
 
-Download the weights, cfg and labels files from [this](https://github.com/lthquy/Yolov3-tiny-Face-weights) repo. place the .weights and .cfg file in /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo, after that make a labels.txt file consisting of one class 'Face'.
+* Download the weights, cfg and labels files from [this](https://github.com/lthquy/Yolov3-tiny-Face-weights) repo. place the .weights and .cfg file in /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo, after that make a labels.txt file consisting of one class 'Face'.
 
-if the below mentioned files are already existing in your workspace please move them to /bkp and move these files in /objectDetector_Yolo
+* if the below mentioned config files are already existing in your workspace please move them to /bkp and move these files in /objectDetector_Yolo
 ```bash
 cd /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 
@@ -99,20 +99,20 @@ cp ./config_infer_primary_yoloV3_tiny.txt /opt/nvidia/deepstream/deepstream-5.0/
 cp ./dstest2_pgie_config.txt /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 
 ```
-add names or paths of the respective files based on your config [here](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/81a3cad4efa76eea9f98e96dfd5540f341107068/YoloApp/config_infer_primary_yoloV3_tiny.txt#L65-L68) once everything is in place we can test our app.
+* add names or paths of the respective files based on your config [here](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/81a3cad4efa76eea9f98e96dfd5540f341107068/YoloApp/config_infer_primary_yoloV3_tiny.txt#L65-L68) once everything is in place we can test our app.
 
 ```bash
 #Test if we properly configured YOLO to run with Deepstream
 cd /opt/nvidia/deepstream/deepstream-5.0/sources/objectDetector_Yolo
 deepstream-app -c ./deepstream_app_config_yoloV3_tiny.txt
 ```
-change the [source](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/81a3cad4efa76eea9f98e96dfd5540f341107068/YoloApp/deepstream_app_config_yoloV3_tiny.txt#L47) in case you want to test on some other video
+* change the [source](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/81a3cad4efa76eea9f98e96dfd5540f341107068/YoloApp/deepstream_app_config_yoloV3_tiny.txt#L47) in case you want to test on some other video
 
 ## Prepare FaceNet
-This step relies on [this]() repo. I couldn't make things work using this repo. for more info follow [this](https://github.com/riotu-lab/deepstream-facenet/issues/5) issue hence I've made some modifications to keep things rolling.
+* This step relies on [this]() repo. I couldn't make things work using this repo. for more info follow [this](https://github.com/riotu-lab/deepstream-facenet/issues/5) issue hence I've made some modifications to keep things rolling.
 
 
-First, download the keras model of Facenet from [this](https://github.com/nyoki-mtl/keras-facenet) fork and place it in /mtcnn_facenet_cpp_tensorRT/ModelConverion/KerasModel
+* First, download the keras model of Facenet from [this](https://github.com/nyoki-mtl/keras-facenet) fork and place it in /mtcnn_facenet_cpp_tensorRT/ModelConverion/kerasmodel
 
 ```bash
 #Test if we properly configured YOLO to run with Deepstream
@@ -120,7 +120,7 @@ cd ./mtcnn_facenet_cpp_tensorRT/ModelConversion
 python3 h5topb.py --input_path ./kerasmodel/facenet_keras_128.h5 --output_path ./tensorflowmodel/facenet.pb
 
 #Convert Tensorflow model to an ONNX model. This will take approx 50 mins and this has to be done on the host device
-python3 -m tf2onnx.convert --input ./tensorflowmodel/facenet_freezed.pb --inputs input_1:0[1,160,160,3] --inputs-as-nchw input_1:0 --outputs Bottleneck_BatchNorm/batchnorm_1/add_1:0 --output onnxmodel/facenetconv.onnx
+python3 -m tf2onnx.convert --input ./tensorflowmodel/facenet.pb --inputs input_1:0[1,160,160,3] --inputs-as-nchw input_1:0 --outputs Bottleneck_BatchNorm/batchnorm_1/add_1:0 --output onnxmodel/facenetconv.onnx
 
 #Convert ONNX model to a model that can take dynamic input size
 python3 dynamic_conv.py --input_path ./onnxmodel/facenetconv.onnx --output_path ./dynamiconnxmodel/dynamicfacenetmodel.onnx
@@ -128,19 +128,19 @@ python3 dynamic_conv.py --input_path ./onnxmodel/facenetconv.onnx --output_path 
 ```
 
 ## Python Implementation
-Once we have the dynamic onnx model copy it to /mtcnn_facenet_cpp_tensorRT/facenet-python/facenetmodel
+* Once we have the dynamic onnx model copy it to /mtcnn_facenet_cpp_tensorRT/facenet-python/facenetmodel
 ```bash
 cd ./mtcnn_facenet_cpp_tensorRT/ModelConversion/dynamiconnxmodel/
 cp ./dynamicfacenetmodel.onnx  /path/to/mtcnn_facenet_cpp_tensorRT/facenet-python/facenetmodel
 
-#Now, copy the facenet-python model to /opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps
+#Now, copy the facenet-python dir to /opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps
 cd ./mtcnn_facenet_cpp_tensorRT
 cp -r ./facenet-python /opt/nvidia/deepstream/deepstream-5.0/sources/deepstream_python_apps/apps
 
 ```
-Now, change the [paths](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/baac7f037a0767f7061c075556937c1655fe0db8/facenet-python/deepstream_facenet.py#L326-L327) of required files based on your environment to start the app.
+* Now, change the [paths](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/baac7f037a0767f7061c075556937c1655fe0db8/facenet-python/deepstream_facenet.py#L326-L327) of required files based on your environment to start the app.
 
-[this](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/361a1682c9a01ab0f8b974f3af486f12bbb0a96f/facenet-python/dstest2_sgie1_config.txt#L63) as well.
+* [This](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/361a1682c9a01ab0f8b974f3af486f12bbb0a96f/facenet-python/dstest2_sgie1_config.txt#L63) as well.
 
 ```bash
 #Start the app
@@ -176,13 +176,24 @@ shape:  128
  -0.47283262 -0.3241306 ]
 ```
 
-[This](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/baac7f037a0767f7061c075556937c1655fe0db8/facenet-python/deepstream_facenet.py#L223) line prints the 128d vector which is the output of the Facenet model. you can compare this vector with the the embeddings of known people and can infer if there is a match or not. 
+* [This](https://github.com/shubham-shahh/mtcnn_facenet_cpp_tensorRT/blob/baac7f037a0767f7061c075556937c1655fe0db8/facenet-python/deepstream_facenet.py#L223) line prints the 128d vector which is the output of the Facenet model. you can compare this vector with the the embeddings of known people and can infer if there is a match or not. 
 
-[This](https://www.pyimagesearch.com/2018/06/18/face-recognition-with-opencv-python-and-deep-learning/) tutorial shows how to make a pickle file of known embeddings and compare them with the ones recived from the model in real time.
+* [This](https://www.pyimagesearch.com/2018/06/18/face-recognition-with-opencv-python-and-deep-learning/) tutorial shows how to make a pickle file of known embeddings and compare them with the ones recived from the model in real time.
 
-The current implementation supports .H264 files, if you want to use .mp4, RTSP, or USB webcams refer the deepstream-python-apps, in different test apps, different Gstream pipelines are demonstrated. This example is based on deepstream test-app-2
+* The current implementation supports .H264 files, if you want to use .mp4, RTSP, or USB webcams refer the deepstream-python-apps, in different test apps, different Gstream pipelines are demonstrated. This example is based on deepstream test-app-2
 
 
+## C++ Implementation
+
+For running FaceNet with C++ Deepstream app, First
+
+
+```ini
+Shape 128
+128d Tensor
+ 0.267679 -0.251554 -0.260311 -0.223737 0.319461 0.119369 -0.0708687 -0.221111 0.267715 -0.0990431 0.141647 -0.297575 -0.142546 -0.526927 0.163986 -0.0697501 0.595039 -0.607409 0.244937 -0.193974 -0.268592 0.0620347 -0.845466 0.308341 0.0138658 -0.0437872 0.511274 0.0900756 -0.24564 0.108228 0.408589 0.172266 0.120605 -0.149561 0.227818 -0.182969 0.160609 0.0315109 0.545435 0.293824 0.155773 0.25595 -0.0702008 -0.366996 -0.782633 -0.414467 -0.046183 0.0648381 0.299499 0.0560513 0.326161 0.13931 0.529288 -0.562848 0.376559 0.338937 0.164113 -0.272101 -0.0265516 -0.552251 -0.194472 -0.344293 0.149408 0.960968 0.282589 0.415575 0.12719 0.00664066 0.0597391 -0.0656708 0.254978 -0.845805 0.623282 -0.711394 -0.207582 0.21915 0.0530824 0.540761 -0.331404 -0.380826 -0.508088 -0.118071 0.025195 0.608881 0.216518 -0.262486 0.522583 -0.626702 -0.64167 0.615544 0.364192 0.103187 -0.506685 -0.0775325 0.406819 -0.00199352 0.256417 -0.283961 -0.615214 0.268594 -0.229041 0.60271 0.223027 0.0621645 0.132152 -0.00342648 -0.176054 -0.0365441 -0.267923 -0.77549 0.175019 -0.0819169 0.398986 0.301 -0.029393 0.063587 -0.306683 0.719321 0.56422 0.190449 -0.0865007 -0.501071 0.14652 0.157381 0.187478 -0.450476 0.0641025 -0.0103367outside for
+
+```
 
 
 
