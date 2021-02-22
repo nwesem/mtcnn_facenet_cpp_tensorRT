@@ -225,7 +225,7 @@ CUDA_VER = 10.2 make
 
 #Run the App
 
-./deepstream-infer-tensor-meta-app ./any-mp4-video-file
+./deepstream-infer-tensor-meta-app file:///home/ubuntu/video1.mp4
 
 ```
 #### Output
@@ -237,7 +237,14 @@ Shape 128
 
 ```
 
-*This app can support .Mp4 format, to run this app with USB Webcams and RTSP stream, check the pipelines of other sample Deepstream Apps and make changes.
+* This app can support .Mp4 format and RTSP streams check the pipelines of other sample Deepstream Apps to run USB webcams.
+```bash
+#Run .MP4
+./deepstream-test3-app file:///home/ubuntu/video1.mp4 file:///home/ubuntu/video2.mp4
+
+#Run RTSP streams./deepstream-test3-app rtsp://127.0.0.1/video1 rtsp://127.0.0.1/video2
+```
+
 
 
 
