@@ -242,7 +242,8 @@ Shape 128
 #Run .MP4
 ./deepstream-test3-app file:///home/ubuntu/video1.mp4 file:///home/ubuntu/video2.mp4
 
-#Run RTSP streams./deepstream-test3-app rtsp://127.0.0.1/video1 rtsp://127.0.0.1/video2
+#Run RTSP streams
+./deepstream-test3-app rtsp://127.0.0.1/video1 rtsp://127.0.0.1/video2
 ```
 
 
