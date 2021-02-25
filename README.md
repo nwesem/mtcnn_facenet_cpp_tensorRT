@@ -195,7 +195,7 @@ cd /opt/nvidia/deepstream/deepstream-5.0/sources/apps/sample_apps/deepstream-inf
 CUDA_VER = 10.2 make
 
 #Run test app
-./deepstream-infer-tensor-meta-app -t infer /opt/nvidia/deepstream/deepstream-5.0/samples/streams/sample_720p.mp4
+./deepstream-infer-tensor-meta-app -t infer /opt/nvidia/deepstream/deepstream-5.0/samples/streams/sample_720p.h264
 
 ```
 * If the App runs fine, we can proceed with the next steps
