@@ -12,8 +12,8 @@ TRT_LOGGER = trt.Logger(trt.Logger.INTERNAL_ERROR)
 trt_runtime = trt.Runtime(TRT_LOGGER)
 
 engine_path = "./facenet_engine.plan"
-input_file_path = 'anas.png'
-dataset_embeddings_path = '/home/jetson-nx/tensorrt/embeddings/embeddings-yasser.npz'
+input_file_path = 'pat/to/your/testimage.jpg'
+dataset_embeddings_path = '/path/to/your/dataset'
 HEIGHT = 160
 WIDTH = 160
 
