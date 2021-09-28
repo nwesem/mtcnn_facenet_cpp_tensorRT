@@ -35,7 +35,7 @@ int main()
     int videoFrameHeight = 480;
     int maxFacesPerScene = 5;
     float knownPersonThreshold = 1.;
-    bool isCSICam = true;
+    bool isCSICam = false;
 
     // init facenet
     FaceNetClassifier faceNet = FaceNetClassifier(gLogger, dtype, uffFile, engineFile, batchSize, serializeEngine,
@@ -85,7 +85,7 @@ int main()
         faceNet.featureMatching(frame);
         auto endFeatM = chrono::steady_clock::now();
         faceNet.resetVariables();
-        
+
         cv::imshow("VideoSource", frame);
         nbFrames++;
         outputBbox.clear();
