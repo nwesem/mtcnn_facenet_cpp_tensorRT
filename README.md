@@ -15,4 +15,4 @@ Ref. project :
 
 Forked and confirmed it's able to run on [Jetson Nano Jetpack 4.5.1](https://developer.nvidia.com/jetpack-sdk-451-archive)
 
- <img src="./Nano JP4.5 - jtop INFO.PNG" width = "40%" height = "40%" alt="jtop INFO"  />
+ <img src="./Nano JP4.5 - jtop INFO.PNG" width = "80%" height = "80%" alt="jtop INFO"  />
