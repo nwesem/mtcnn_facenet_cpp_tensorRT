@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtrt_l2norm_helper.a CMakeFiles/trt_l2norm_helper.dir/l2norm_helper.cpp.o CMakeFiles/trt_l2norm_helper.dir/trt_l2norm_helper_generated_l2norm_helper.cu.o
+/usr/bin/ranlib libtrt_l2norm_helper.a

@@ -1,0 +1,6 @@
+/home/acs2/ting/workspace/.trash-sync-pycharm/nwesem..mtcnn_facenet_cpp_tensorRT/mtcnn_facenet_cpp_tensorRT/build/CMakeFiles/rebuild_cache.dir
+/home/acs2/ting/workspace/.trash-sync-pycharm/nwesem..mtcnn_facenet_cpp_tensorRT/mtcnn_facenet_cpp_tensorRT/build/CMakeFiles/mtcnn_facenet_cpp_tensorRT.dir
+/home/acs2/ting/workspace/.trash-sync-pycharm/nwesem..mtcnn_facenet_cpp_tensorRT/mtcnn_facenet_cpp_tensorRT/build/CMakeFiles/edit_cache.dir
+/home/acs2/ting/workspace/.trash-sync-pycharm/nwesem..mtcnn_facenet_cpp_tensorRT/mtcnn_facenet_cpp_tensorRT/build/trt_l2norm_helper/CMakeFiles/rebuild_cache.dir
+/home/acs2/ting/workspace/.trash-sync-pycharm/nwesem..mtcnn_facenet_cpp_tensorRT/mtcnn_facenet_cpp_tensorRT/build/trt_l2norm_helper/CMakeFiles/trt_l2norm_helper.dir
+/home/acs2/ting/workspace/.trash-sync-pycharm/nwesem..mtcnn_facenet_cpp_tensorRT/mtcnn_facenet_cpp_tensorRT/build/trt_l2norm_helper/CMakeFiles/edit_cache.dir
