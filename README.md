@@ -1,41 +1,29 @@
-# Face Recognition for NVIDIA Jetson (Nano) using TensorRT
-Face recognition with [Google FaceNet](https://arxiv.org/abs/1503.03832)
-architecture and retrained model by David Sandberg
-([github.com/davidsandberg/facenet](https://github.com/davidsandberg/facenet))
-using TensorRT and OpenCV. <br> This project is based on the
-implementation of l2norm helper functions which are needed in the output
-layer of the FaceNet model. Link to the repo:
-[github.com/r7vme/tensorrt_l2norm_helper](https://github.com/r7vme/tensorrt_l2norm_helper). <br>
-Moreover, this project uses an adapted version of [PKUZHOU's implementation](https://github.com/PKUZHOU/MTCNN_FaceDetection_TensorRT)
+# Face Recognition for NVIDIA Jetson AGX Orin using TensorRT
+- This project is based on the implementation of this repo:
+[Face Recognition for NVIDIA Jetson (Nano) using TensorRT](https://github.com/nwesem/mtcnn_facenet_cpp_tensorRT). Since the original author is no longer updating his content, and many of the original content cannot be applied to the new Jetpack version and the new Jetson device. Therefore, I have modified the original author's content slightly to make it work for face recognition on the Jetson AGX Orin.
+- Face recognition with [Google FaceNet](https://arxiv.org/abs/1503.03832) architecture and retrained model by David Sandberg ([github.com/davidsandberg/facenet](https://github.com/davidsandberg/facenet)) using TensorRT and OpenCV.
+- Moreover, this project uses an adapted version of [PKUZHOU's implementation](https://github.com/PKUZHOU/MTCNN_FaceDetection_TensorRT)
 of the mtCNN for face detection. More info below.
 
 ## Hardware
-* NVIDIA Jetson Nano
-* Raspberry Pi v2 camera 
+- Nvidia Jetson AGX Orin DVK
+- Logitech C922 Pro HD Stream Webcam
 
-If you want to use a USB camera instead of Raspi Camera set the boolean _isCSICam_ to false in [main.cpp](./src/main.cpp).
+If you want to use a CSI camera instead of USB Camera, set the boolean _isCSICam_ to true in [main.cpp](./src/main.cpp).
 
 
 ## Dependencies
-cuda 10.2 + cudnn 8.0 <br> TensorRT 7.x <br> OpenCV 4.1.1 <br>
-TensorFlow r1.14 (for Python to convert model from .pb to .uff)
+- JetPack 5.1
+- CUDA 11.4.19 + cuDNN 8.6.0
+- TensorRT 8.5.2
+- OpenCV 4.5.4
+- Tensorflow 2.11
 
-## Update
-This master branch now uses Jetpack 4.4, so dependencies have slightly changed and tensorflow is not preinstalled anymore. So there is an extra step that takes a few minutes more than before. <br>
-In case you would like to use older versions of Jetpack there is a tag jp4.2.2, that can links to the older implementation.
 
 ## Installation
-#### 1. Install Cuda, CudNN, TensorRT, and TensorFlow for Python 
-You can check [NVIDIA website](https://developer.nvidia.com/) for help.
-Installation procedures are very well documented.<br><br>**If you are
-using NVIDIA Jetson (Nano, TX1/2, Xavier) with Jetpack 4.4**, most needed packages
-should be installed if the Jetson was correctly flashed using SDK
-Manager or the SD card image, you will only need to install cmake, openblas and tensorflow:
-```bash
-sudo apt install cmake libopenblas-dev
-```
-#### 2. Install Tensorflow
-The following shows the steps to install Tensorflow for Jetpack 4.4. This was copied from the official [NVIDIA documentation](https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform/index.html). I'm assuming you don't need to install it in a virtual environment. If yes, please refer to the documentation linked above. If you are not installing this on a jetson, please refer to the official tensorflow documentation.
+
+#### 1. Install Tensorflow
+The following shows the steps to install Tensorflow for Jetpack 5.1. This was copied from the official [NVIDIA documentation](https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform/index.html). I'm assuming you don't need to install it in a virtual environment. If yes, please refer to the documentation linked above. If you are not installing this on a jetson, please refer to the official tensorflow documentation.
 
 ```bash
 # Install system packages required by TensorFlow:
@@ -44,13 +32,14 @@ sudo apt install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpe
 
 # Install and upgrade pip3
 sudo apt install python3-pip
-sudo pip3 install -U pip testresources setuptools
+sudo python3 -m pip install --upgrade pip
+sudo pip3 install -U testresources setuptools==65.5.0
 
 # Install the Python package dependencies
-sudo pip3 install -U numpy==1.16.1 future==0.18.2 mock==3.0.5 h5py==2.10.0 keras_preprocessing==1.1.1 keras_applications==1.0.8 gast==0.2.2 futures protobuf pybind11
+sudo pip3 install -U numpy==1.22 future==0.18.2 mock==3.0.5 keras_preprocessing==1.1.2 keras_applications==1.0.8 gast==0.4.0 protobuf pybind11 cython pkgconfig packaging h5py==3.6.0
 
-# Install TensorFlow using the pip3 command. This command will install the latest version of TensorFlow compatible with JetPack 4.4.
-sudo pip3 install --pre --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v44 'tensorflow<2'
+# Install TensorFlow using the pip3 command. This command will install the latest version of TensorFlow compatible with JetPack 5.1.
+sudo pip3 install --extra-index-url https://developer.download.nvidia.com/compute/redist/jp/v51 tensorflow==2.11.0+nv23.01
 ```
 
 
@@ -136,26 +125,12 @@ now parses and serializes the model from .uff to a runtime engine
 (.engine file). 
 
 ## Performance
-Performance on **NVIDIA Jetson Nano**
-* ~60ms +/- 20ms for face detection using mtCNN
-* ~22ms +/- 2ms per face for facenet inference
-* **Total:** ~15fps
-
-Performance on **NVIDIA Jetson AGX Xavier**:
-* ~40ms +/- 20ms for mtCNN 
-* ~9ms +/- 1ms per face for inference of facenet
-* **Total:** ~22fps
+Performance on **NVIDIA Jetson AGX Orin**
+* ~22ms for face detection using mtCNN
+* ~4ms per face for facenet inference
+* **Total:** ~38fps
   
 ## License
 Please respect all licenses of OpenCV and the data the machine learning models (mtCNN and Google FaceNet)
 were trained on.
 
-## FAQ
-Sometimes the camera driver doesn't close properly that means you will have to restart the __nvargus-daemon__:
-```bash
-sudo systemctl restart nvargus-daemon
-``` 
-
-## Info
-Niclas Wesemann <br>
-[niclaswesemann@gmail.com](mailto:niclas.wesemann@gmail.com) <br>
