@@ -116,7 +116,7 @@ Put images of people in the imgs folder. Please only use images that contain one
 the OpenCV GUI, press "**N**" on your keyboard to add a new face. The camera input will stop until
 you have opened your terminal and put in the name of the person you want to add.
 ```bash
-./mtcnn_facenet_cpp_tensorRT
+./face_recogition_tensorRT
 ```
 Press "**Q**" to quit and to show the stats (fps).
 
