@@ -126,9 +126,9 @@ now parses and serializes the model from .uff to a runtime engine
 
 ## Performance
 Performance on **NVIDIA Jetson AGX Orin**
-* ~22ms for face detection using mtCNN
+* ~24ms for face detection using mtCNN
 * ~4ms per face for facenet inference
-* **Total:** ~38fps
+* **Total:** ~30fps
   
 ## License
 Please respect all licenses of OpenCV and the data the machine learning models (mtCNN and Google FaceNet)
