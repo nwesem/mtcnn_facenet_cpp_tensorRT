@@ -3,7 +3,6 @@
 #include <chrono>
 #include <NvInfer.h>
 #include <NvInferPlugin.h>
-#include <l2norm_helper.h>
 #include <opencv2/highgui.hpp>
 #include "faceNet.h"
 #include "videoStreamer.h"
@@ -35,7 +34,7 @@ int main()
     int videoFrameHeight = 480;
     int maxFacesPerScene = 5;
     float knownPersonThreshold = 1.;
-    bool isCSICam = true;
+    bool isCSICam = false;
 
     // init facenet
     FaceNetClassifier faceNet = FaceNetClassifier(gLogger, dtype, uffFile, engineFile, batchSize, serializeEngine,
@@ -69,6 +68,7 @@ int main()
     // loop over frames with inference
     auto globalTimeStart = chrono::steady_clock::now();
     while (true) {
+        auto fps_start = chrono::steady_clock::now();
         videoStreamer.getFrame(frame);
         if (frame.empty()) {
             std::cout << "Empty frame! Exiting...\n Try restarting nvargus-daemon by "
@@ -85,6 +85,12 @@ int main()
         faceNet.featureMatching(frame);
         auto endFeatM = chrono::steady_clock::now();
         faceNet.resetVariables();
+        
+        auto fps_end = chrono::steady_clock::now();
+        auto milliseconds = chrono::duration_cast<chrono::milliseconds>(fps_end-fps_start).count();
+        float fps = (1000/milliseconds);
+        std::string label = cv::format("FPS: %.2f ", fps);
+        cv::putText(frame, label, cv::Point(15, 30), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 0, 0), 2);
         
         cv::imshow("VideoSource", frame);
         nbFrames++;

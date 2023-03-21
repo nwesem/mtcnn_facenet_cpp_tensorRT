@@ -1,4 +1,6 @@
 #include "faceNet.h"
+#include <vector>
+#include <cmath>
 
 int FaceNetClassifier::m_classCount = 0;
 
@@ -51,10 +53,11 @@ void FaceNetClassifier::createOrLoadEngine() {
     }
     else {
         IBuilder *builder = createInferBuilder(m_gLogger);
-        INetworkDefinition *network = builder->createNetwork();
+        IBuilderConfig* config = builder->createBuilderConfig();
+        INetworkDefinition *network = builder->createNetworkV2(0U);
         IUffParser *parser = createUffParser();
-        parser->registerInput("input", DimsCHW(160, 160, 3), UffInputOrder::kNHWC);
-        parser->registerOutput("embeddings");
+        parser->registerInput("input", Dims3(160, 160, 3), UffInputOrder::kNHWC);
+        parser->registerOutput("Bottleneck/BatchNorm/batchnorm/add_1");
 
         if (!parser->parse(m_uffFile.c_str(), *network, m_dtype))
         {
@@ -68,15 +71,15 @@ void FaceNetClassifier::createOrLoadEngine() {
         /* build engine */
         if (m_dtype == DataType::kHALF)
         {
-            builder->setFp16Mode(true);
+            config->setFlag(BuilderFlag::kFP16);
         }
         else if (m_dtype == DataType::kINT8) {
-            builder->setInt8Mode(true);
+            config->setFlag(BuilderFlag::kINT8);
             // ToDo
             //builder->setInt8Calibrator()
         }
         builder->setMaxBatchSize(m_batchSize);
-        builder->setMaxWorkspaceSize(1<<30);
+        config->setMaxWorkspaceSize(1<<30);
         // strict will force selected datatype, even when another was faster
         //builder->setStrictTypeConstraints(true);
         // Disable DLA, because many layers are still not supported
@@ -84,7 +87,7 @@ void FaceNetClassifier::createOrLoadEngine() {
         //builder->allowGPUFallback(true);
         //builder->setDefaultDeviceType(DeviceType::kDLA);
         //builder->setDLACore(1);
-        m_engine = builder->buildCudaEngine(*network);
+        m_engine = builder->buildEngineWithConfig(*network, *config);
 
         /* serialize engine and write to file */
         if(m_serializeEngine) {
@@ -155,7 +158,7 @@ void FaceNetClassifier::doInference(float* inputData, float* output) {
     int size_of_single_input = 3 * 160 * 160 * sizeof(float);
     int size_of_single_output = 128 * sizeof(float);
     int inputIndex = m_engine->getBindingIndex("input");
-    int outputIndex = m_engine->getBindingIndex("embeddings");
+    int outputIndex = m_engine->getBindingIndex("Bottleneck/BatchNorm/batchnorm/add_1");
 
     void* buffers[2];
 
@@ -262,10 +265,24 @@ FaceNetClassifier::~FaceNetClassifier() {
     // std::cout << "FaceNet was destructed" << std::endl;
 }
 
+std::vector<float> l2Normalize(const std::vector<float>& vec) {
+    float norm = 0.0;
+    for (const auto& element : vec) {
+        norm += element * element;
+    }
+    norm = std::sqrt(norm);
+    std::vector<float> normalizedVec(vec.size());
+    for (std::size_t i = 0; i < vec.size(); ++i) {
+        normalizedVec[i] = vec[i] / norm;
+    }
+    return normalizedVec;
+}
 
 // HELPER FUNCTIONS
 // Computes the distance between two std::vectors
-float vectors_distance(const std::vector<float>& a, const std::vector<float>& b) {
+float vectors_distance(const std::vector<float>& aa, const std::vector<float>& bb) {
+    std::vector<float>	a = l2Normalize(aa);
+    std::vector<float>	b = l2Normalize(bb);
     std::vector<double>	auxiliary;
     std::transform (a.begin(), a.end(), b.begin(), std::back_inserter(auxiliary),//
                     [](float element1, float element2) {return pow((element1-element2),2);});
