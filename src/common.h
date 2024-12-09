@@ -31,7 +31,7 @@
 class Logger : public nvinfer1::ILogger
 {
 public:
-    void log(nvinfer1::ILogger::Severity severity, const char* msg) override
+    void log(nvinfer1::ILogger::Severity severity, const char* msg) noexcept override
     {
         // suppress info-level messages
         //if (severity == Severity::kINFO) return;

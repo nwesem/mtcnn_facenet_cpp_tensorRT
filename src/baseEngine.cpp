@@ -66,9 +66,10 @@ void baseEngine::caffeToGIEModel(const std::string &deployFile,                /
     else {
         // create the builder
         IBuilder *builder = createInferBuilder(gLogger);
+        IBuilderConfig* config = builder->createBuilderConfig();
 
         // parse the caffe model to populate the network, then set the outputs
-        INetworkDefinition *network = builder->createNetwork();
+        INetworkDefinition *network = builder->createNetworkV2(0U);
         ICaffeParser *parser = createCaffeParser();
 
         const IBlobNameToTensor *blobNameToTensor = parser->parse(deployFile.c_str(),
@@ -81,8 +82,8 @@ void baseEngine::caffeToGIEModel(const std::string &deployFile,                /
 
         // Build the engine
         builder->setMaxBatchSize(maxBatchSize);
-        builder->setMaxWorkspaceSize(1 << 25);
-        ICudaEngine *engine = builder->buildCudaEngine(*network);
+        config->setMaxWorkspaceSize(1 << 25);
+        ICudaEngine *engine = builder->buildEngineWithConfig(*network, *config);
         assert(engine);
 
         context = engine->createExecutionContext();
